@@ -1,0 +1,101 @@
+17/04/2006 :
+- MouseHelper bugged under LINUX JRE 1.5.0_06 : no mouse click event generated at all.
+
+06/03/2006 :
+- Display the the local position of the mainChar in the octree  with key 'U'.
+
+10/02/2006 :
+- 2D Lens Flare done, ok.
+
+09/02/2006 :
+- Lens Flare implemented but the result looks wrong. I'll change and
+do all calculations in 2D and the ray must pass in the screenCenter.
+
+04/02/2006 :
+- Frustum culling implemented and operational ! 'Space' bar.
+- Glow ! key 'G'.
+
+02/02/2006 :
+- Key 'O' to see bounding spheres (used for Frustum Culling).
+
+15/01/2006 :
+- Modif terrain: le 0,0 physique correspond au 0,0 openGL,
+  et non au centre de la map, cons�quence : on utilise le
+  cadran positif seulement. (map totale r�duite d'1/4).
+- On peut faire joujou avec le mode Cinema avec la touche 'C'.
+
+14/01/2006 :
+- Ajout de normales au terrain g�n�r� par heightmap.
+
+13/01/2006 :
+-Correction du bug des textures manquantes dans le main
+-D�placement du perso par dragging de la souris
+
+12/01/2006 :
+-Effet cinema
+
+10/01/2006 :
+-Declanchement correct des animations
+
+20/11/2005 :
+-Correction du chargeur de texture.
+
+19/11/2005 :
+-MD2 Models become display lists : everything is faster.
+-Couleur du soleil d�bugg�.
+-Le click attend le tick.
+
+2/11/2005 :
+-Nouvelle herbe.
+
+31/10/2005 :
+-Corrections / adaptation avec Main.main.
+
+30/10/2005 :
+-Ajout de la Reflexion : maitrise du stencil buffer, La premiere etape vers les ombres.
+-Amelioration de l'herbe : maintenant des qu'on la regarde, elle a toujours une forme.
+(avant c'etait plat).
+
+29/10/2005 :
+-Les particules sont des billboards (font toujours face a la camera).
+-Decoupage de GraphicalRep en sous classes.
+
+27/10/2005 :
+-Modification du systeme de particules : transparence, positionnement, correction de bug.
+
+25/10/2005 :
+-Ajout d'un systeme de particules en spirale.
+
+22/10/2005 :
+-Ajout de la rotation du mainChar.
+
+21/10/2005 :
+-Ajout d'une fonction permettant de modifier le farClipPlane (distance de vision).
+-Correction des appels a glTexImage2D pour que la couche alpha des textures soit prise en compte.
+
+20/10/2005 :
+-Skybox se voie retiree son JPanel. Passage direct du GLCanvas dans la JFrame.
+-Je viens de me rendre compte qu'il vaut mieux avoir un sol pour que le picking fonctionne bien :
+ajout d'un warning signalant l'absence d'un sol au moment du click.
+
+19/10/2005 :
+-Modification du constructeur de GraphicalRep, dans la partie qui charge la texture : maintenant,
+il essaye en premier de charger la texture .png, et s'il ne peut pas, il charge la version jpg.
+-Modification de loadTexture pour le support des textures .png avec une couche alpha (4bpp). (il y a des
+bugs : le format des pixels n'est pas correct -> les objets sont rouges).
+
+18/10/2005 :
+-Partage de meshs entre les objets du même nom, toutes les frames de toutes les animations sont
+partagees : gain memoire important car c'etaient les meshs qui prenaient le plus de mémoire
+pour le moment (~2Mo/mesh). (utilisation de hastables).
+
+17/10/2005 :
+-Ajout d'une fonction qui rend la liste des animations disponibles pour l'objet sur lequel la
+methode est appelee.
+-Ajout d'une fonction qui permet le declanchement d'une animation.
+-Ajout d'une fonction qui rend les points extremes du modele (utile pour la detection des collisions).
+
+16/10/2005 :
+-Extraction du terrain qui etait programme directement a l'interrieur de la classe GraphicsEngine, en objet
+GraphicalRep standard. Ajout du type GraphicalRep.FORMAT_TERRAIN.
+-Pareille separation des bordures de l'ecran. Ajout du type GraphicalRep.FORMAT_BORDER.

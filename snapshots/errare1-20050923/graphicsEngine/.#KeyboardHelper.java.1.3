@@ -1,0 +1,50 @@
+package graphicsEngine;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class KeyboardHelper implements KeyListener{	
+	private float zRotation;
+	private float xRotation;
+	public float xPosition = 0f;
+	public float yPosition = 0f;
+	public float zPosition = 0f;
+	public float camX = 0f;
+	public float camY = 0f;
+	public float camZ = 0f;
+	public boolean[] keys = new boolean[256];
+	
+	public void keyTyped(KeyEvent e) {
+		if(e.getKeyChar()=='z'){
+			xPosition -= (float) Math.sin(-zRotation*(3.14)/180) * 10.2f; 
+			yPosition -= (float) Math.cos(-zRotation*(3.14/180)) * 10.2f;}
+		else if(e.getKeyChar()=='s'){
+			xPosition += (float) Math.sin(-zRotation*(3.14/180)) * 10.2f;
+			yPosition += (float) Math.cos(-zRotation*(3.14)/180) * 10.2f;}
+		else if(e.getKeyChar()=='q')
+			zRotation-=1;
+		else if(e.getKeyChar()=='d')
+			zRotation+=1;
+		else if(e.getKeyChar()=='g')
+			xRotation+=2;
+		else if(e.getKeyChar()=='t')
+			xRotation-=2;
+	}
+	
+	public void keyPressed(KeyEvent e) 
+    {
+        if(e.getKeyCode() < 255)
+        {
+            keys[e.getKeyCode()] = true;
+            System.out.println("kb");
+        }
+    }
+	public void keyReleased(KeyEvent e) 
+    {
+        if(e.getKeyCode() < 255)
+        {
+            keys[e.getKeyCode()] = false;            
+        }
+    }
+
+}

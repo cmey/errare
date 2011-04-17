@@ -1,0 +1,94 @@
+package graphicsEngine;
+/**
+ * Mouse helper by Cyberchrist.
+ * Implements simple mouse rotation/zoom.
+ */
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
+import net.java.games.jogl.GL;
+
+public class MouseHelper implements MouseListener, MouseMotionListener
+{
+    private float angleX, angleY;
+    private float angleX0, angleY0;
+    private float dist;
+    private float dist0;
+    private int mouseX, mouseY;
+    private int lastButton;
+    
+    /**
+     * Construct new mousehelper.
+     * @param dist Initial distance to camera
+     */
+    public MouseHelper(float dist)
+    {
+        this.dist = dist;
+    }
+    
+    /**
+     * Construct new mousehelper.     
+     */
+    public MouseHelper()
+    {     
+    }
+    
+    /**
+     * Update camera.
+     * @param gl GL object
+     */
+    public void updateCamera(GL gl)
+    {
+        gl.glTranslatef(0.0f, 0.0f, -dist);
+        gl.glRotatef(angleX, 1.0f, 0.0f, 0.0f);
+        gl.glRotatef(angleY, 0.0f, 1.0f, 0.0f);
+    }
+    
+    // MouseListener methods
+    public void mouseClicked(MouseEvent e) {
+    	mouseX=e.getX();
+    	mouseY=e.getY();
+    }
+
+    public void mouseEntered(MouseEvent e) {}
+
+    public void mouseExited(MouseEvent e) {}
+
+    public void mousePressed(MouseEvent e) 
+    {
+    	System.out.println("mouse");
+        lastButton = e.getButton();
+        if (lastButton == MouseEvent.BUTTON1) 
+        {
+            angleX0 = angleX; angleY0 = angleY;
+            mouseX = e.getX(); mouseY = e.getY();
+        } 
+        else if (lastButton == MouseEvent.BUTTON2) 
+        {
+            dist0 = dist;
+            mouseY = e.getY();
+        }
+    }
+
+    public void mouseReleased(MouseEvent e) {  }
+
+    // MouseMotionListener 
+    public void mouseDragged(MouseEvent e) 
+    {
+        int dx, dy, dz;
+        if (lastButton == MouseEvent.BUTTON1) 
+        {
+            dx = mouseX - e.getX(); dy = mouseY - e.getY();
+            angleY = angleY0 - dx;
+            angleX = angleX0 - dy;
+        }
+        if (lastButton == MouseEvent.BUTTON2) 
+        {
+            dz = mouseY - e.getY();
+            dist = dist0 + dz/100.0f;
+        }
+    }
+
+    public void mouseMoved(MouseEvent e) {}
+}

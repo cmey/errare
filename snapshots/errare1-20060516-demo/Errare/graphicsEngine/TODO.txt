@@ -1,0 +1,4 @@
+- un module pour afficher juste le personnage en 3D dans l'équipement.
+  perso + équipement + effets associés (flamme sur épée)
+  pas de sol, pas de ciel
+  fond transparent

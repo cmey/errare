@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="graphicsEngine/MD2Animation.java" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="mckoidb.jar"/>
+	<classpathentry kind="lib" path="mkjdbc.jar"/>
+	<classpathentry kind="lib" path="jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="jogl.jar"/>
+	<classpathentry kind="lib" path="jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="jogl-demos-util.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

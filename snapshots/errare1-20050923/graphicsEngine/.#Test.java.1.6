@@ -1,0 +1,25 @@
+package graphicsEngine;
+
+import java.util.ArrayList;
+
+import javax.swing.JFrame;
+
+import Main.Rep;
+
+
+public class Test {
+	
+	public static void main(String[] args) {
+		JFrame jf=new JFrame();
+		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ArrayList<Rep> li = new ArrayList<Rep>();	//on crée la liste à passer au moteur
+		Rep rep =  new Rep();						//une Rep vide (à charger)
+		rep.setGraphicalRep(new GraphicalRep("models/terminator.md2"));	//on charge la Rep
+		li.add(rep);									//on ajoute la Rep à la liste à passer
+		GraphicsEngine app =new GraphicsEngine();	//on démarre le moteur
+		app.setDisplayList(li);						//on dit au moteur quoi afficher en passant la liste
+		jf.setContentPane(app);
+		jf.setVisible(true);
+		jf.pack();
+	}
+}

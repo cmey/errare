@@ -1,0 +1,140 @@
+package graphicsEngine;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.JPanel;
+
+import main.Main;
+import main.Rep;
+import net.java.games.jogl.Animator;
+import net.java.games.jogl.GL;
+import net.java.games.jogl.GLCanvas;
+import net.java.games.jogl.GLCapabilities;
+import net.java.games.jogl.GLDrawable;
+import net.java.games.jogl.GLDrawableFactory;
+import net.java.games.jogl.GLEventListener;
+import net.java.games.jogl.GLU;
+import physicsEngine.MainCharacter;
+import physicsEngine.PhysicalRep;
+
+public class GraphicsEngine extends JPanel implements Runnable, GLEventListener{
+	public float xPosition = 0f;
+	public float yPosition = 0f;
+	public float zPosition = 0f;
+	public float camX = 0f;
+	public float camY = 0f;
+	public float camZ = 0f;
+	//private MouseHelper mouseHelper = new MouseHelper(100);
+	//private KeyboardHelper keyboardHelper = new KeyboardHelper();
+	private GLCanvas glc;
+	private GL gl;
+	private GLU glu;
+	private int width, height;
+	private int nb_frames;
+	private List<Rep> li;
+	private Rep currentRep;
+	private GraphicalRep currentGRep;
+	private PhysicalRep currentPRep;
+	private Main main;
+	private MainCharacter mainChar;
+	
+	public GraphicsEngine(Main main){
+		this.main = main;
+		li = new LinkedList();
+		GLCapabilities capabilities=new GLCapabilities();
+		capabilities.setHardwareAccelerated(true);
+		capabilities.setDoubleBuffered(true);
+		glc = GLDrawableFactory.getFactory().createGLCanvas(capabilities);
+		glc.addGLEventListener(this);
+		this.add(glc);
+		this.setSize(640,480);
+		glc.setSize(640,480);
+		glc.setVisible(true);
+		//glc.addMouseListener(mouseHelper);
+		//glc.addKeyListener(keyboardHelper);
+		width = glc.getWidth();
+		height = glc.getHeight();
+		//Animator animator = new Animator(glc);
+		//animator.start();
+	}
+	
+	public void setDisplayList(List <Rep> li){
+		// appelé par Martin: physicsRep
+		this.li=li;
+	}
+
+	public void test(GraphicalRep r){
+		r.initDrawMD2(gl, glu);
+		r.drawMD2(gl);
+	}
+	public void setMainChar(Rep r) {
+		PhysicalRep pr = r.getPhysicsRep();
+		if(pr instanceof MainCharacter)
+			mainChar = (MainCharacter)pr;
+	}
+	public void init(GLDrawable glDrawable) {
+		gl = glDrawable.getGL();
+		glu = glDrawable.getGLU();
+		gl.glViewport(0,0,width,height);
+		gl.glMatrixMode(GL.GL_PROJECTION); 
+		gl.glLoadIdentity(); 
+		glu.gluPerspective(45,(float)width/(float)height,1,1000); 
+		gl.glMatrixMode(GL.GL_MODELVIEW); 
+		gl.glLoadIdentity(); 
+		gl.glShadeModel(GL.GL_SMOOTH);
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glClearColor(0.0f,0.0f,0.0f,0.0f);
+		glc.requestFocusInWindow();
+		gl.glClearColor(1,1,1,1);
+		gl.glColor3f(0,1,1);
+	}
+
+	public void display(GLDrawable glDrawable) {
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		gl.glLoadIdentity();
+		glu.gluLookAt(100, 500, 500, 0, 0, 0, 0,1,0);	
+		//mouseHelper.updateCamera(gl);
+		//glu.gluLookAt(xPosition, yPosition, zPosition, camX, camY, camZ, 0,1,0);
+		for (Rep currentRep : li) {
+			currentGRep = currentRep.getGraphicalRep();
+			TextureTool.setStage(gl, 0, currentGRep.getTex());
+			currentPRep = currentRep.getPhysicsRep();
+			gl.glTranslatef(currentPRep.x,currentPRep.y,0);
+			//if(currentGRep.getFormat()==1) { //.MD2
+				currentGRep.initDrawMD2(gl, glu);
+				currentGRep.drawMD2(gl);
+			//}
+			//if(currentGRep.getFormat()==2) { //.errare
+			//	currentGRep.buildERA(gl,currentPRep.x,currentPRep.y,0,0,0,0);
+			//}
+		}
+	}
+
+	public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) 
+	{
+		GL gl = glDrawable.getGL();
+		gl.glViewport(x, y, width, height);
+		// Reset projection matrix
+		gl.glMatrixMode(GL.GL_PROJECTION);             
+		gl.glLoadIdentity();                        
+		// Calculate the aspect ratio of the window
+		float aspect = (float)((float) width / (float) height);
+		// Setup perspective
+		glDrawable.getGLU().gluPerspective(45, aspect, 0.1f, 5000.0f);
+		// Load modelview
+		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glLoadIdentity(); 
+	}
+
+	public void displayChanged(GLDrawable arg0, boolean arg1, boolean arg2) {
+	}
+
+	public void run() {
+	}
+
+	//picking
+	//appeler SetPick(Point2D p, boolean b) chez Martin:physicsRep 
+}

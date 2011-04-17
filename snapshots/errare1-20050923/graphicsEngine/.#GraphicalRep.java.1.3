@@ -1,0 +1,376 @@
+package graphicsEngine;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.StringTokenizer;
+import javax.swing.JPanel;
+
+import Main.Rep;
+import net.java.games.jogl.GL;
+
+/**
+ * @author Cyberchrist
+ */
+public class GraphicalRep extends Rep {
+	protected String rep3D_filename;
+	protected int nb_Points;
+	protected int nb_Faces;
+	protected int nb_Normals;
+	protected int nb_TexCoords;
+	final static int MAX_POINTS3D=100000;
+	final static int MAX_FACES3D=100000;
+	final static int MAX_NORMALS=100000;
+	final static int MAX_TEXCOORDS=100000;
+	protected Point3D[] TPoints = new Point3D[MAX_POINTS3D];
+	protected Face3D[] TFaces = new Face3D[MAX_FACES3D];
+	protected Point3D[] TNormals = new Point3D[MAX_NORMALS];
+	protected Point3D[] TTexCoords = new Point3D[MAX_TEXCOORDS];
+	// Animation frame information
+	protected class AnimFrame{
+		public String name;
+		public float[] vertices;
+	}
+	// Index lists for vertices
+	public int[] indices;
+	public int[] uvIndices;
+	// Model base info    
+	protected float[] normals;
+	protected float[] uvs;	
+	protected AnimFrame interpolatedFrame;
+	// Frame array
+	protected AnimFrame[] frames;
+	// Start and end frames
+	protected int startFrame = 0;
+	protected int endFrame = 0;
+	// Current and next animation frame
+	protected int curAnimFrame = 0;
+	protected int nextAnimFrame = 1;
+	// Animation timings
+	protected long lastAnimTime = 0;
+	// Animation FPS for number of interpolations
+	protected int fps = 30;
+	protected boolean animate = false;        
+	protected ByteBuffer texture;
+	protected int tWidth;
+	protected int tHeight;
+	protected int[] textures;
+	
+	public GraphicalRep(String filename){
+		this.rep3D_filename=filename;
+		String[] fn = filename.split(".");
+		if(fn[1]=="md2") {
+			loadFileMD2(filename);
+		}
+	}
+	
+	
+	
+	GL build(GL gl,float px, float py, float pz, float rx, float ry, float rz){
+		gl.glPushMatrix();
+		gl.glTranslatef(px, py, pz);
+		gl.glRotatef(rx, 1, 0, 0);
+		gl.glRotatef(ry, 0, 1, 0);
+		gl.glRotatef(rz, 0, 0, 1);
+		textures = new int[1];
+		gl.glGenTextures(1, textures);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture);
+		
+		gl.glBegin(GL.GL_TRIANGLES);
+		int j, whichVertex;
+		for(j=0; j<nb_Faces; j++) {
+			for(whichVertex=0; whichVertex<3; whichVertex++) {
+				int Index = TFaces[j].TabIndexPoint[whichVertex];
+				gl.glNormal3f(TNormals[Index].X, TNormals[Index].Y, TNormals[Index].Z);
+				gl.glTexCoord3f(TTexCoords[Index].X, TTexCoords[Index].Y, TTexCoords[Index].Z);
+				gl.glVertex3f(TPoints[Index].X, TPoints[Index].Y, TPoints[Index].Z);
+			}
+		}
+		gl.glEnd();
+		gl.glPopMatrix();
+		return gl;
+	}
+	/**
+	 * Draw model.
+	 * @param gl Gl object     
+	 */
+	public void draw(GL gl)
+	{
+		// Get first frame
+		AnimFrame frame = frames[startFrame];
+		
+		// Animate? 
+		if (animate)
+		{
+			createInterpolatedFrame();
+			frame = interpolatedFrame;
+		}
+		// Draw it
+		gl.glBegin(GL.GL_TRIANGLES);
+		for (int i = 0; i < indices.length; i++)
+		{            
+			gl.glTexCoord2f(uvs[(uvIndices[i]*2)], uvs[(uvIndices[i]*2)+1]);
+			gl.glVertex3f(frame.vertices[(indices[i]*3)], frame.vertices[(indices[i]*3)+1], frame.vertices[(indices[i]*3)+2]);                            
+		}
+		gl.glEnd();                
+	}
+	
+	
+	
+	/**
+	 * Load MD2 model.
+	 * @param filePath Path to model
+	 * @return true on success, false on failure
+	 */
+	public boolean loadFileMD2(String filePath) 
+	{
+		try
+		{
+			// Attempt to get URL
+			URL url = this.getClass().getClassLoader().getResource(filePath);  
+			InputStream is = url.openStream();
+			
+			// Open buffered stream for speed            
+			BufferedInputStream bis = new BufferedInputStream(is);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] data = new byte[1024 * 8];
+			int read = 0;
+			while(true) 
+			{
+				read = bis.read(data);
+				if (read < 0) break;
+				baos.write(data, 0, read);
+			}
+			data = baos.toByteArray(); 
+			
+			// Close stream
+			bis.close();
+			
+			// New byte reader
+			ByteLoader byteLoader = new ByteLoader(data);
+			
+			// Read header
+			int magic            = byteLoader.readInt();
+			int version          = byteLoader.readInt();
+			int skinWidth        = byteLoader.readInt();
+			int skinHeight       = byteLoader.readInt();
+			int frameSize        = byteLoader.readInt();
+			int numSkins         = byteLoader.readInt();
+			int numVertices      = byteLoader.readInt();
+			int numTexCoords     = byteLoader.readInt();
+			int numTriangles     = byteLoader.readInt();
+			int numGlCommands    = byteLoader.readInt();
+			int numFrames        = byteLoader.readInt();
+			int offsetSkins      = byteLoader.readInt();
+			int offsetTexCoords  = byteLoader.readInt();
+			int offsetTriangles	 = byteLoader.readInt();
+			int offsetFrames     = byteLoader.readInt();
+			
+			// Check header version
+			if (version != 8)
+			{
+				System.out.println("MD2 version error : version 8 expected");
+				return false;
+			}
+			
+			// Read in uv coords
+			byteLoader.setFileOffset(offsetTexCoords);                        
+			uvs = new float[numTexCoords * 2];
+			for (int i = 0; i < numTexCoords; i++)
+			{                
+				// Convert
+				uvs[(i*2)] = (float)byteLoader.readShort() / skinWidth;
+				uvs[(i*2)+1] = 1 - (float)byteLoader.readShort() / skinHeight;                                               
+			}
+			
+			// Read in faces
+			byteLoader.setFileOffset(offsetTriangles);
+			indices = new int[numTriangles * 3];
+			uvIndices = new int[numTriangles * 3];
+			int curIndex = 0;
+			for (int i = 0; i < numTriangles; i++)
+			{
+				// Read face (changing to correct GL winding)
+				indices[curIndex+2] = byteLoader.readShort();
+				indices[curIndex+1] = byteLoader.readShort();
+				indices[curIndex] = byteLoader.readShort();
+				uvIndices[curIndex+2] = byteLoader.readShort();
+				uvIndices[curIndex+1] = byteLoader.readShort();
+				uvIndices[curIndex] = byteLoader.readShort();
+				curIndex += 3;
+			}
+			
+			// Allocate frames
+			frames = new AnimFrame[numFrames];
+			
+			// Allocate interpolated frame
+			interpolatedFrame = new AnimFrame();
+			interpolatedFrame.vertices = new float[numVertices * 3];            
+			
+			// Move file pointer to frames
+			byteLoader.setFileOffset(offsetFrames);
+			
+			// Store some vars outside for speed
+			float[] scale = new float[3];
+			float[] translate = new float[3];                        
+			AnimFrame curFrame;
+			int tempx;
+			int tempy;
+			int tempz;     
+			int dummy;
+			
+			// Read in all frames
+			for (int i = 0; i < numFrames; i++)
+			{
+				// Allocate space for frame
+				frames[i] = new AnimFrame();
+				
+				// Allocate vertices
+				frames[i].vertices = new float[numVertices * 3];
+				
+				// Get current frame for readability
+				curFrame = frames[i];                                
+				
+				// Read scale, translation and name
+				scale[0] = byteLoader.readFloat();
+				scale[1] = byteLoader.readFloat();
+				scale[2] = byteLoader.readFloat();
+				translate[0] = byteLoader.readFloat();
+				translate[1] = byteLoader.readFloat();
+				translate[2] = byteLoader.readFloat();
+				curFrame.name = byteLoader.readString(16);
+				//System.out.println(curFrame.name);
+				byteLoader.addToFileOffset(16);
+				
+				// Read and convert vertices
+				for (int v = 0; v < numVertices; v++)
+				{
+					// Read packed vertex
+					tempx = byteLoader.readByte();
+					tempy = byteLoader.readByte();
+					tempz = byteLoader.readByte();			
+					// Skip light normal
+					dummy = byteLoader.readByte();
+					// Convert and add vertex (swapping z and y)
+					curFrame.vertices[(v*3)] = tempx * scale[0] + translate[0];
+					curFrame.vertices[(v*3)+2] = -1 * (tempy * scale[1] + translate[1]);
+					curFrame.vertices[(v*3)+1] = tempz * scale[2] + translate[2];                                           
+				}                                                                
+			}                                   
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
+		// Success
+		return true;
+	}
+	
+	/**
+	 * Set start and end frames.
+	 * @param startFrame First animation frame
+	 * @param endFrame Last animation frame
+	 */
+	public void setFrameRange(int startFrame, int endFrame)
+	{
+		this.startFrame = startFrame;
+		this.endFrame = endFrame;
+		
+		// Limit for the dummies
+		if (startFrame < 0) startFrame = 0;
+		if (startFrame > frames.length) startFrame = frames.length;
+		if (endFrame < 0) endFrame = 0;
+		if (endFrame > frames.length) endFrame = frames.length;
+		
+		// Setup current and next anim frames
+		curAnimFrame = startFrame;
+		nextAnimFrame = startFrame+1;
+	}
+	
+	/**
+	 * Set animation FPS.
+	 * @param fps FPS to play animation by
+	 */
+	public void setFPS(int fps)
+	{        
+		this.fps = fps;
+	}
+	
+	/**
+	 * Toggle animation.
+	 * @param enable Enable animation switch
+	 */
+	public void toggleAnim(boolean enable)
+	{
+		this.animate = enable;
+	}
+	
+	/**
+	 * Reset animation.
+	 */
+	public void resetAnim()
+	{
+		// Setup current and next anim frames
+		curAnimFrame = startFrame;
+		nextAnimFrame = startFrame+1;
+		lastAnimTime = 0;
+	}
+	
+	/** 
+	 * Create interpolated frame.
+	 */
+	private void createInterpolatedFrame()
+	{                
+		long curTime = System.currentTimeMillis();
+		long elapsedTime = curTime - lastAnimTime;
+		
+		// Get interpolation time
+		float t = elapsedTime / (1000.0f / fps);
+		
+		// Get next frame
+		nextAnimFrame = (curAnimFrame + 1) % endFrame;
+		if (nextAnimFrame > endFrame)
+		{
+			nextAnimFrame = startFrame;
+		}	
+		
+		// Calculate current and next frames
+		if(elapsedTime > (1000.0f / fps))
+		{
+			curAnimFrame = nextAnimFrame;                                   
+			lastAnimTime = curTime;
+		}
+		
+		// Interpolate frames and store in interpolatedFrame
+		for (int v = 0; v < frames[curAnimFrame].vertices.length; v++)
+		{
+			interpolatedFrame.vertices[v] = (frames[curAnimFrame].vertices[v] + t * (frames[nextAnimFrame].vertices[v] - frames[curAnimFrame].vertices[v]));
+		}	
+	}
+	
+	
+	
+	/* public void loadTexture() {
+	 try {
+	 BufferedImage buff = ImageIO.read(new File("objetgraphique/marie.jpg"));
+	 Raster r = buff.getRaster();
+	 int[] img = null;
+	 img = r.getPixels(260, 240, 128, 128, img);
+	 texture = ByteBuffer.allocateDirect(128 * 128 * 3);
+	 for (int y = 0; y < 128; y++)
+	 for (int x = 0; x < 128; x++) {
+	 texture.put((byte) img[(y * 128 + x) * 3]);
+	 texture.put((byte) img[(y * 128 + x) * 3 + 1]);
+	 texture.put((byte) img[(y * 128 + x) * 3 + 2]);
+	 }
+	 tWidth = 128;
+	 tHeight = 128;
+	 } catch (IOException e) {
+	 e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+	 }
+	 } */
+}

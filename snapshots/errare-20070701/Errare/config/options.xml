@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<options>
+   <difficulty>2</difficulty>
+<gamespeed>2</gamespeed>
+<mousespeed>100</mousespeed>
+<loudness>100</loudness>
+<screenwidth>1024</screenwidth>
+<screenheight>768</screenheight>
+<bitcolor>32</bitcolor>
+<frequency>70</frequency>
+<gamma>3</gamma>
+</options>

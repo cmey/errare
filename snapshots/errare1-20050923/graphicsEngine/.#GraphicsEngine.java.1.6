@@ -1,0 +1,107 @@
+package graphicsEngine;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
+import net.java.games.jogl.GL;
+import net.java.games.jogl.GLCanvas;
+import net.java.games.jogl.GLCapabilities;
+import net.java.games.jogl.GLDrawable;
+import net.java.games.jogl.GLDrawableFactory;
+import net.java.games.jogl.GLEventListener;
+import net.java.games.jogl.GLU;
+import physicsEngine.PhysicalRep;
+import Main.Rep;
+
+public class GraphicsEngine extends JPanel implements GLEventListener{
+	public float xPosition = 0f;
+	public float yPosition = 0f;
+	public float zPosition = 0f;
+	public float camX = 0f;
+	public float camY = 0f;
+	public float camZ = 0f;
+	private MouseHelper mouseHelper = new MouseHelper(100);
+	protected boolean[] keys = new boolean[256];
+	private KeyboardHelper keyboardHelper = new KeyboardHelper();
+	private GLCanvas glc;
+	private GL gl;
+	private GLU glu;
+	private int width, height;
+	private int nb_frames;
+	private List<Rep> li;
+	private Rep currentRep;
+	private GraphicalRep currentGRep;
+	private PhysicalRep currentPRep;
+	
+	public void setDisplayList(List <Rep> li){
+		// appelé par Martin: physicsRep
+		this.li=li;
+	}
+
+	public void init(GLDrawable glDrawable) {
+		GLCapabilities capabilities=new GLCapabilities();
+		capabilities.setHardwareAccelerated(true);
+		capabilities.setDoubleBuffered(true);
+		glc = GLDrawableFactory.getFactory().createGLCanvas(capabilities);
+		glc.addGLEventListener(this);
+		this.add(glc);
+		this.setSize(640,480);
+		glc.setSize(640,480);
+		glc.setVisible(true);
+		glc.addKeyListener(keyboardHelper);
+		width = glc.getWidth();
+		height = glc.getHeight();
+		gl = glDrawable.getGL();
+		glu = glDrawable.getGLU();
+		gl.glViewport(0,0,width,height);
+		gl.glMatrixMode(GL.GL_PROJECTION); 
+		gl.glLoadIdentity(); 
+		glu.gluPerspective(45,(float)width/(float)height,1,1000); 
+		gl.glMatrixMode(GL.GL_MODELVIEW); 
+		gl.glLoadIdentity(); 
+		gl.glShadeModel(GL.GL_SMOOTH);
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glClearColor(0.0f,0.0f,0.0f,0.0f);
+		glc.requestFocusInWindow();
+		gl.glClearColor(1,1,1,1);
+		gl.glColor3f(0,1,1);
+	}
+
+	public void display(GLDrawable glDrawable) {
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		gl.glLoadIdentity();
+		glu.gluLookAt(camX, camY, camZ, xPosition, yPosition, zPosition, 0,1,0);
+		
+		while(!li.isEmpty()){
+			currentRep = li.get(0);
+			currentGRep = currentRep.getGraphicalRep();
+			currentPRep = currentRep.getPhysicsRep();
+			currentGRep.build(gl,currentPRep.x,currentPRep.y,0,0,0,0);
+			li.remove(0);
+		}
+	}
+
+	public void reshape(GLDrawable glDrawable, int x, int y, int width, int height) 
+	{
+		GL gl = glDrawable.getGL();
+		gl.glViewport(x, y, width, height);
+		// Reset projection matrix
+		gl.glMatrixMode(GL.GL_PROJECTION);             
+		gl.glLoadIdentity();                        
+		// Calculate the aspect ratio of the window
+		float aspect = (float)((float) width / (float) height);
+		// Setup perspective
+		glDrawable.getGLU().gluPerspective(45, aspect, 0.1f, 5000.0f);
+		// Load modelview
+		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glLoadIdentity();  
+	}
+
+	public void displayChanged(GLDrawable arg0, boolean arg1, boolean arg2) {
+	}
+
+	//picking
+	//appeler SetPick(Point2D p, boolean b) chez Martin:physicsRep 
+}

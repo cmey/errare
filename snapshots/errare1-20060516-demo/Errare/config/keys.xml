@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keys>
+   <gui>
+      <potion1>49</potion1>
+   <potion2>50</potion2>
+   <potion3>51</potion3>
+   <potion4>52</potion4>
+   <inventory>73</inventory>
+   <characteristics>65</characteristics>
+   <pause>80</pause>
+   </gui>
+</keys>
