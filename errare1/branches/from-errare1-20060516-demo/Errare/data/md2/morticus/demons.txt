@@ -1,0 +1,54 @@
+Player Model For Quake 2
+by: Jade Moffatt Jones <JMoffatt@netcom.ca>
+Nemesis Media 
+
+Necromicus & Morticus v1.01
+
+The weapon model problem for those who don't use vwep has been fixed.
+Sorry about that!
+
+This Model is my second player model for Quake 2. 
+There are two versions of this model, Necromicus and Morticus.
+The reason I did this is because Necromicus' wings might cause 
+problems for people, first they bump the poly count up a lot 
+and they go way outside of the bounding box.
+They look really cool though especially when you see someone 
+jumping down on you from high above.
+
+To save on download time I have removed all the duplicate files from the 
+Morticus directory except for one. To use Morticus just copy
+all the files from the Necromicus directory into the Morticus 
+directory EXCEPT THE TRIS.MD2 AND THE JUMP1.WAV FILES!!!!!!!.
+
+* Special note that the taunt sequence causes the model to triple
+in size! This is to only be used in large open areas or else his 
+head will disappear into the ceiling. *
+
+If you are running a slow machine and don't want to be able
+to see the wings even if someone else is using Necromicus then
+just copy the tris.md2 from the Morticus directory and paste 
+it over the tris.md2 in the Necromicus directory
+
+MAKE SURE YOU HAVE ONLY DIRECTORIES IN THE PLAYERS DIRECTORY!
+NO ZIP FILES LYING AROUND IN THERE OR IT WON'T WORK!!!
+
+
+If you are a developer.. well GIVE ME A JOB!!
+
+If you would like to see more samples of my art work go to
+http://www.3dartists.com/jade_images.html or
+http://www.netcom.ca/~jmoffatt
+
+Special thanx go out to:
+Haplo
+and CRBOT
+for helping me test my model.
+and also thanx to Fross and Chaos for your advice.
+
+To install just put the directory "Necromicus" and "Morticus" in the players dir 
+eg. c:\quake2\baseq2\players\Necromicus\<files>
+eg. c:\quake2\baseq2\players\Morticus\<files>
+
+Thanx all!
+
+J Moffatt
