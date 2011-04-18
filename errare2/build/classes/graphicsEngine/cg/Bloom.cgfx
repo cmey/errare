@@ -1,0 +1,111 @@
+//--------------------------------------------------------------------------------------
+//
+// simple_glow sample
+//
+// Author: Tristan Lorach
+// Email: tlorach@nvidia.com
+//
+// simple Glow effect, to show how to add a postprocessing effect over
+// an existing sample without modifying it too deeply
+//
+// Copyright (c) NVIDIA Corporation. All rights reserved.
+//--------------------------------------------------------------------------------------
+
+float blendFactor = 1.0f;
+float glowFactor = 4.5f;
+float2 horizontalDir = {1.0/200.0, 0};
+float2 verticalDir = {0, 1.0/200.0};
+
+#define NUMWT 9
+float Gauss[NUMWT] = {0.93, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
+#define WT_NORMALIZE (1.0/(1.0+2.0*(0.93 + 0.8 + 0.7 + 0.6 + 0.5 + 0.4 + 0.3 + 0.2 + 0.1)))
+
+sampler2D srcSampler;
+sampler2D tempSampler;
+///////////////////////////////////////////////////////////////////////
+// Vertex programs
+///////////////////////////////////////////////////////////////////////
+float4 vpPassThrough(float4 P : POSITION, float4 tc : TEXCOORD0, out float4 tcout : TEXCOORD0) : POSITION
+{
+  tcout = tc;
+  return P;
+}
+///////////////////////////////////////////////////////////////////////
+// Fragment programs
+///////////////////////////////////////////////////////////////////////
+float4 fpGaussianPassH(float4 tc : TEXCOORD0/*, uniform float2 dir*/) : COLOR
+{
+  float4 c2;
+  float4 c = tex2D(srcSampler, tc.xy) * (WT_NORMALIZE);
+  float2 step = horizontalDir;
+  float2 dir = step;
+  for(int i=0; i<NUMWT; i++)
+  {
+	c2 = tex2D(srcSampler, tc.xy + dir);
+	c += c2 * (Gauss[i]*WT_NORMALIZE);
+	c2 = tex2D(srcSampler, tc.xy - dir);
+	c += c2 * (Gauss[i]*WT_NORMALIZE);
+	dir += step;
+  }
+  return c * glowFactor;
+}
+
+float4 fpGaussianPassV(float4 tc : TEXCOORD0/*, uniform float2 dir*/) : COLOR
+{
+  float4 c2;
+  float4 c = tex2D(srcSampler, tc.xy) * (WT_NORMALIZE);
+  float2 step = verticalDir;
+  float2 dir = step;
+  for(int i=0; i<NUMWT; i++)
+  {
+	c2 = tex2D(srcSampler, tc.xy + dir);
+	c += c2 * (Gauss[i]*WT_NORMALIZE);
+	c2 = tex2D(srcSampler, tc.xy - dir);
+	c += c2 * (Gauss[i]*WT_NORMALIZE);
+	dir += step;
+  }
+  return c;
+}
+float4 fpFinalCompositing(float4 tc : TEXCOORD0) : COLOR
+{
+  float4 c = tex2D(tempSampler, tc.xy);
+  c *= blendFactor;
+  return c;
+}
+///////////////////////////////////////////////////////////////////////
+// Technique
+///////////////////////////////////////////////////////////////////////
+technique Filter
+{
+  pass verticalPass
+  {
+    AlphaTestEnable = false;
+    BlendEnable = false;
+    CullFaceEnable = false;
+    DepthTestEnable = false;
+    DepthMask = false;
+    VertexProgram = compile arbvp1 vpPassThrough();
+    FragmentProgram = compile arbfp1 fpGaussianPassV();//verticalDir);
+  }
+  pass horizontalPass
+  {
+    AlphaTestEnable = false;
+    BlendEnable = false;
+    CullFaceEnable = false;
+    DepthTestEnable = false;
+    DepthMask = false;
+    VertexProgram = compile arbvp1 vpPassThrough();
+    FragmentProgram = compile arbfp1 fpGaussianPassH();//horizontalDir);
+  }
+  pass drawFinal
+  {
+    AlphaTestEnable = false;
+    BlendEnable = true;
+    BlendFunc = int2(ConstantAlpha, One);
+    CullFaceEnable = false;
+    DepthTestEnable = false;
+    DepthMask = false;
+    VertexProgram = compile arbvp1 vpPassThrough();
+    FragmentProgram = compile arbfp1 fpFinalCompositing();
+  }
+}

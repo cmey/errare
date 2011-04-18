@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<test>
+
+	<exit>key.pressed.ESCAPE</exit>
+
+   <left_pressed>key.pressed.Q</left_pressed>
+   <right_pressed>key.pressed.D</right_pressed>
+   <backward_pressed>key.pressed.S</backward_pressed>
+   <forward_pressed>key.pressed.Z</forward_pressed>
+   <jump_pressed>key.pressed.SPACE</jump_pressed>
+   
+   <left_released>key.released.Q</left_released>
+   <right_released>key.released.D</right_released>
+   <backward_released>key.released.S</backward_released>
+   <forward_released>key.released.Z</forward_released>
+   <jump_released>key.released.SPACE</jump_released> 
+ 
+ 
+<!-- 
+ Start of GameEngine key definition.
+ -->
+   <attack>mouse.clicked.button1</attack>
+ <!-- 
+ End of GameEngine key definition.
+ --> 
+   
+ <!-- 
+ Start of Graphics Engine key definition.
+ -->
+   <forward>key.pressed.UP</forward>
+   <left>key.pressed.LEFT</left>
+   <right>key.pressed.RIGHT</right>
+   <backward>key.pressed.DOWN</backward>
+   
+   <fculling>key.shift.pressed.X</fculling>
+   <wire_display>key.shift.pressed.W</wire_display>
+   <terrain>key.shift.pressed.Y</terrain>
+   <sky>key.shift.pressed.K</sky>
+   <fog>key.shift.pressed.D</fog>
+   <bloom>key.shift.pressed.G</bloom>
+   <reflection>key.shift.pressed.R</reflection>
+   <far_view>key.shift.pressed.F</far_view>
+   <shadowmap>key.shift.pressed.S</shadowmap>
+   <cinema>key.shift.pressed.C</cinema>
+   <draw_oculled>key.shift.pressed.T</draw_oculled>
+   <octree>key.shift.pressed.O</octree>
+   <tremble>key.pressed.T</tremble>
+   <fullscreen>key.shift.pressed.F11</fullscreen>
+   <blood_test>key.shift.pressed.B</blood_test>
+   <settingOccluder>key.pressed.F5</settingOccluder>
+   <normals>key.shift.pressed.N</normals>
+   <VBOs>key.shift.pressed.V</VBOs>
+   <FBOs>key.pressed.F</FBOs>
+   <watershader>key.shift.pressed.ENTER</watershader>
+   <mouse_move>mouse.moved</mouse_move>
+   <rotate_start>mouse.pressed.button3</rotate_start>
+   <rotate_view>mouse.dragged.button3</rotate_view>
+   <zoom_in>mouse.wheeldown</zoom_in>
+   <zoom_out>mouse.wheelup</zoom_out>
+<!-- 
+ End of Graphics Engine key definition.
+ --> 
+   
+   <chat_open>key.ctrl.pressed.C</chat_open>
+   <equipement_open>key.ctrl.pressed.E</equipement_open>
+   <inventory_open>key.ctrl.pressed.I</inventory_open>
+   <loading_activated>key.ctrl.pressed.L</loading_activated>
+   <gui_debug>key.ctrl.pressed.F1</gui_debug>
+   <gui_pick>key.ctrl.pressed.P</gui_pick>
+   <mouse_click>mouse.clicked.button1</mouse_click>
+   <mouse_dragg>mouse.dragged.button1</mouse_dragg>
+   <mouse_release>mouse.released.button1</mouse_release>
+   <char_a>key.pressed.A</char_a>
+   <char_b>key.pressed.B</char_b>
+   <char_c>key.pressed.C</char_c>
+   <char_d>key.pressed.D</char_d>
+   <char_e>key.pressed.E</char_e>
+   <char_f>key.pressed.F</char_f>
+   <char_g>key.pressed.G</char_g>
+   <char_h>key.pressed.H</char_h>
+   <char_i>key.pressed.I</char_i>
+   <char_j>key.pressed.J</char_j>
+   <char_k>key.pressed.K</char_k>
+   <char_l>key.pressed.L</char_l>
+   <char_m>key.pressed.M</char_m>
+   <char_n>key.pressed.N</char_n>
+   <char_o>key.pressed.O</char_o>
+   <char_p>key.pressed.P</char_p>
+   <char_q>key.pressed.Q</char_q>
+   <char_r>key.pressed.R</char_r>
+   <char_s>key.pressed.S</char_s>
+   <char_t>key.pressed.T</char_t>
+   <char_u>key.pressed.U</char_u>
+   <char_v>key.pressed.V</char_v>
+   <char_w>key.pressed.W</char_w>
+   <char_x>key.pressed.X</char_x>
+   <char_y>key.pressed.Y</char_y>
+   <char_z>key.pressed.Z</char_z>
+   <enter>key.pressed.ENTER</enter>
+   <char_A>key.shift.pressed.A</char_A>
+   <char_B>key.shift.pressed.B</char_B>
+   <char_C>key.shift.pressed.C</char_C>
+   <char_D>key.shift.pressed.D</char_D>
+   <char_E>key.shift.pressed.E</char_E>
+   <char_F>key.shift.pressed.F</char_F>
+   <char_I>key.shift.pressed.I</char_I>
+   <char_J>key.shift.pressed.J</char_J>
+   <char_K>key.shift.pressed.K</char_K>
+   <char_L>key.shift.pressed.L</char_L>
+   <char_M>key.shift.pressed.M</char_M>
+   <char_N>key.shift.pressed.N</char_N>
+   <char_O>key.shift.pressed.O</char_O>
+   <char_P>key.shift.pressed.P</char_P>
+   <char_Q>key.shift.pressed.Q</char_Q>
+   <char_R>key.shift.pressed.R</char_R>
+   <char_S>key.shift.pressed.S</char_S>
+   <char_T>key.shift.pressed.T</char_T>
+   <char_U>key.shift.pressed.U</char_U>
+   <char_V>key.shift.pressed.V</char_V>
+   <char_W>key.shift.pressed.W</char_W>
+   <char_X>key.shift.pressed.X</char_X>
+   <char_Y>key.shift.pressed.Y</char_Y>
+   <char_Z>key.shift.pressed.Z</char_Z>
+   <char_G>key.shift.pressed.G</char_G>
+   <char_H>key.shift.pressed.H</char_H>
+   <return>key.pressed.BACK_SPACE</return></test>

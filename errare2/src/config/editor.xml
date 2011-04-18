@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<test>
+   <left>key.pressed.LEFT</left>
+   <right>key.pressed.RIGHT</right>
+   <down>key.pressed.DOWN</down>
+   <up>key.pressed.UP</up>
+   <jump>key.pressed.SPACE</jump>
+   
+   <fculling>key.shift.pressed.X</fculling>
+   <wire_display>key.shift.pressed.W</wire_display>
+   <terrain>key.shift.pressed.Y</terrain>
+   <sky>key.shift.pressed.S</sky>
+   <fog>key.shift.pressed.N</fog>
+   <glow>key.shift.pressed.G</glow>
+   <reflection>key.shift.pressed.R</reflection>
+   <far_view>key.shift.pressed.F</far_view>
+   <shadowmap>key.shift.pressed.D</shadowmap>
+   <cinema>key.shift.pressed.C</cinema>
+   <draw_oculled>key.shift.pressed.O</draw_oculled>
+   <octree>key.shift.pressed.T</octree>
+   <tremble>key.pressed.T</tremble>
+   <fullscreen>key.shift.pressed.F11</fullscreen>
+   <blood_test>key.shift.pressed.B</blood_test>
+   <settingOccluder>key.pressed.F5</settingOccluder>
+   <exit>key.pressed.ESCAPE</exit>
+   
+   <mouse_move>mouse.moved</mouse_move>
+   <rotate_view>mouse.dragged.button3</rotate_view>
+   <rotate_start>mouse.pressed.button3</rotate_start>
+   <zoom_in>key.pressed.DOWN</zoom_in>
+   <zoom_out>key.pressed.UP</zoom_out>
+   
+   <push>key.pressed.A</push>
+   <pull>key.pressed.Q</pull>
+   <pick>mouse.pressed.button1</pick>
+   
+</test>

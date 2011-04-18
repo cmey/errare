@@ -1,0 +1,190 @@
+10/06/2009 :
+- fixed a physicsEngine bug : the mainChar was experiencing a small stop in falling
+when near the ground, and then continued falling. Reduced the verticalStep to test
+whith smaller grain
+- even better falling in physicsEngine: now there is a value which represents the
+max distance the mainChar is allowed to levitate over the ground (small : 0.01f)
+in OpenGL units. He iteratively approches the ground.
+
+09/06/2009 :
+- fixed a physicsEngine bug where the mainChar was not correctly falling to the ground,
+    but levitated instead a little over the ground and needed some frames of moving
+    to get to the ground.
+- fixed the permanent "run" animation bug
+- fixed the double jump bug
+- mainChar allowed to move slightly (coef.) while in the air
+
+23/05/2009 :
+- activated everything (all effects) in graphics engine
+
+23/03/2009 :
+- fixed the impossibility to turn in PhysicsEngine (beware of autocast of methods arguments).
+
+26/03/2008 :
+- reduced code length in GraphicsEngine by removing unused code and exporting
+more code into other classes (Extentions, ShadowMapping, KeyboardHelper).
+Added new classes : Picking, Reflection, Fog.
+
+24/03/2008 :
+- when VBO's are'nt available, I am now building display lists instead of using
+direct rendering.
+
+15/01/2008 :
+- distributed the DEMO 2 with Java Web Start, available at http://errare.sf.net
+
+27/12/2007 :
+- corrected the texture for palm.3ds : palm.tga is intercepted and renamed to palm.png at runtime ;p
+
+26/12/2007 :
+- bundled resources as external jars (Errare_datapack.jar and Errare_freeworldpack.jar)
+- added ResourceLocator class to load resources from inside a jar as well as normaly, which allows now to execute by JNLP/JWS
+- modified all resource loading code to use the new ResourceLocator
+- corrected some textures names and added missing textures, now the world lacks only 1 texture on the "palm.3ds"
+
+19/08/2007 :
+- corrected the reflection of the terrain in the water : had to swap glFrontFace (because
+the scene is inverted ?)
+
+16/08/2007 :
+- working to get picking back
+- lens flare is back 
+- updated code of Text3D : text has better size and position
+- bloom uses lens flare' occlusion query of the sun to adjust the glowBlendFactor : the more we look the sun,
+ the more the bloom is powerfull and, as a result, the more we get blinded by the sun !
+
+10/08/2007 :
+- glow/bloom : separable gaussian 2-pass (horizontal and vertical) Cg shader
+
+22/05/2007 :
+- water shader corrected
+
+22/04/2007 :
+- water shader. pb : day and night are inverted (normal is: transparency at night, and full reflection at day)
+
+22/03/2007 :
+- now there is water ! It's only rendered where the terrain lies under the sea level, this saves some vertices and avoids Z-fighting between the terrain and the water.
+
+22/02/2007 :
+- using VBO's instead of display lists. This changed the data structure of graphicalReps
+
+16/12/2006 :
+- Texture recycling (collector) based on a MD5 hash of the file
+
+20/11/2006 :
+- Skydome with texture from http://www.philohome.com/skycollec/equirect/sky1.jpg, it's not a spherical texture and it gives good results.
+
+01/10/2006 :
+- Changed JOGL to JSR-231
+
+30/07/2006 :
+- Massive modification to the editor : no more heightmaps. Totally new aproach. The goal is to have caves !
+Now we have a list of triangles in each node of the octree. We can push and pull the triangles.
+
+15/06/2006 :
+- Gestion des patchs de terrain en découpant automatiquement la heightmap en patchs de taille régulière.
+La display_list d'un patch est recalculée au besoin. Editeur bien plus rapide !
+
+15/05/2006 :
+- Start of an editor software, that alows us to "elevate" mountains in real-time on a heightmap.
+
+17/04/2006 :
+- MouseHelper bugged under LINUX JRE 1.5.0_06 : no mouse click event generated at all.
+
+06/03/2006 :
+- Display the local position of the mainChar in the octree with key 'U'.
+
+10/02/2006 :
+- 2D Lens Flare done, ok.
+
+09/02/2006 :
+- Lens Flare implemented but the result looks wrong. I'll change and
+do all calculations in 2D and the ray must pass in the screenCenter.
+
+04/02/2006 :
+- Frustum culling implemented and operational ! 'Space' bar.
+- Glow ! key 'G'.
+
+02/02/2006 :
+- Key 'O' to see bounding spheres (used for Frustum Culling).
+
+15/01/2006 :
+- Modif terrain: le 0,0 physique correspond au 0,0 openGL,
+  et non au centre de la map, cons�quence : on utilise le
+  cadran positif seulement. (map totale r�duite d'1/4).
+- On peut faire joujou avec le mode Cinema avec la touche 'C'.
+
+14/01/2006 :
+- Ajout de normales au terrain g�n�r� par heightmap.
+
+13/01/2006 :
+-Correction du bug des textures manquantes dans le main
+-D�placement du perso par dragging de la souris
+
+12/01/2006 :
+-Effet cinema
+
+10/01/2006 :
+-Declanchement correct des animations
+
+20/11/2005 :
+-Correction du chargeur de texture.
+
+19/11/2005 :
+-MD2 Models become display lists : everything is faster.
+-Couleur du soleil d�bugg�.
+-Le click attend le tick.
+
+2/11/2005 :
+-Nouvelle herbe.
+
+31/10/2005 :
+-Corrections / adaptation avec Main.main.
+
+30/10/2005 :
+-Ajout de la Reflexion : maitrise du stencil buffer, La premiere etape vers les ombres.
+-Amelioration de l'herbe : maintenant des qu'on la regarde, elle a toujours une forme.
+(avant c'etait plat).
+
+29/10/2005 :
+-Les particules sont des billboards (font toujours face a la camera).
+-Decoupage de GraphicalRep en sous classes.
+
+27/10/2005 :
+-Modification du systeme de particules : transparence, positionnement, correction de bug.
+
+25/10/2005 :
+-Ajout d'un systeme de particules en spirale.
+
+22/10/2005 :
+-Ajout de la rotation du mainChar.
+
+21/10/2005 :
+-Ajout d'une fonction permettant de modifier le farClipPlane (distance de vision).
+-Correction des appels a glTexImage2D pour que la couche alpha des textures soit prise en compte.
+
+20/10/2005 :
+-Skybox se voie retiree son JPanel. Passage direct du GLCanvas dans la JFrame.
+-Je viens de me rendre compte qu'il vaut mieux avoir un sol pour que le picking fonctionne bien :
+ajout d'un warning signalant l'absence d'un sol au moment du click.
+
+19/10/2005 :
+-Modification du constructeur de GraphicalRep, dans la partie qui charge la texture : maintenant,
+il essaye en premier de charger la texture .png, et s'il ne peut pas, il charge la version jpg.
+-Modification de loadTexture pour le support des textures .png avec une couche alpha (4bpp). (il y a des
+bugs : le format des pixels n'est pas correct -> les objets sont rouges).
+
+18/10/2005 :
+-Partage de meshs entre les objets du même nom, toutes les frames de toutes les animations sont
+partagees : gain memoire important car c'etaient les meshs qui prenaient le plus de mémoire
+pour le moment (~2Mo/mesh). (utilisation de hastables).
+
+17/10/2005 :
+-Ajout d'une fonction qui rend la liste des animations disponibles pour l'objet sur lequel la
+methode est appelee.
+-Ajout d'une fonction qui permet le declanchement d'une animation.
+-Ajout d'une fonction qui rend les points extremes du modele (utile pour la detection des collisions).
+
+16/10/2005 :
+-Extraction du terrain qui etait programme directement a l'interrieur de la classe GraphicsEngine, en objet
+GraphicalRep standard. Ajout du type GraphicalRep.FORMAT_TERRAIN.
+-Pareille separation des bordures de l'ecran. Ajout du type GraphicalRep.FORMAT_BORDER.

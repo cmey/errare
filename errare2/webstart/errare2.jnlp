@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="file:/home/christophe/workspace-netbeans/Errare/dist/" href="launch.jnlp">
+    <information>
+        <title>Errare</title>
+        <vendor>christophe</vendor>
+        <description>Errare is a diablo-like 3D RPG game. It is written in Java because we believe games should run on any OS. Gamers unite !</description>
+        <description kind="short">Errare</description>
+        <homepage href="errare.sf.net"/>
+        <icon href="Pey.ico" kind="default"/>
+        <icon href="jnlp_splashscreen.jpg" kind="splash"/>
+        <offline-allowed/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6*" initial-heap-size="64M" max-heap-size="512M" />
+	<property name="sun.java2d.noddraw" value="true"/>        
+        <jar href="Errare.jar" main="true" download="eager"/>
+        <jar href="lib/db4o-5.2-java5.jar" download="eager"/>
+        <jar href="lib/jdic.jar" download="eager"/>
+        <jar href="lib/jdic_stub.jar" download="eager"/>
+        <jar href="lib/jdom.jar" download="eager"/>
+        <jar href="lib/joal.jar" download="eager"/>
+        <jar href="lib/jogg-0.0.7.jar" download="eager"/>
+        <extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"/>
+        <jar href="lib/jorbis-0.0.15.jar" download="eager"/>
+        <jar href="lib/tritonus_share.jar" download="eager"/>
+        <jar href="lib/vecmath.jar" download="eager"/>
+        <jar href="lib/vorbisspi1.0.2.jar" download="eager"/>
+	<jar href="lib/Errare_datapack.jar"/>
+	<jar href="lib/Errare_freeworldpack.jar"/>
+    </resources>
+    <application-desc main-class="main.ClientMain">
+    </application-desc>
+</jnlp>

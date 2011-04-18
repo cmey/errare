@@ -1,0 +1,93 @@
+
+<!--
+-   Freeworld3D version 2.0
+-   http://www.freeworld3d.org
+-   Author: Soconne
+-   Copyright 2005
+-->
+
+<Freeworld3D Version="2.0">
+<Environment>
+   <Viewport Color="78,155,185" Fov="0" NearClip="-0.000000" FarClip="0.000000"/>
+   <Lighting Direction="-0.985000,0.680000,0.174000" Ambient="0.000000,0.000000,0.000000" Diffuse="0.000000,0.000000,0.000000"/>
+</Environment>
+<Terrain Size="257" Step="1.000000">
+   <Heightmap File="/terrain/heightmap16bit.raw" Format="16bit RAW" Scale="0.000407"/>
+</Terrain>
+<TerrainLayers Count="3">
+   <TerrainLayer Name="New Layer" Type="Base Layer">
+      <Texture File="/terrain/New Layer.jpg" ScaleU="1.000000" ScaleV="1.000000"/>
+   </TerrainLayer>
+   <TerrainLayer Name="New Layer1" Type="Detail Layer" BlendMode="Additive">
+      <Texture File="/terrain/New Layer1.jpg" ScaleU="200.000000" ScaleV="200.000000"/>
+   </TerrainLayer>
+   <TerrainLayer Name="Lightmap0" Type="Blend Layer" SrcBlend="ZERO" DstBlend="SRC_COLOR">
+      <Texture File="/terrain/Lightmap0.jpg" ScaleU="1.000000" ScaleV="1.000000"/>
+   </TerrainLayer>
+</TerrainLayers>
+<CachedMeshGroups Count="1">
+   <CachedMeshGroup Name="unsorted" Count="9">
+      <Mesh Name="rock_1.mesh" Id="2" Filename="rock_1.mesh"/>
+      <Mesh Name="rock_3.mesh" Id="3" Filename="rock_3.mesh"/>
+      <Mesh Name="rock_4.mesh" Id="4" Filename="rock_4.mesh"/>
+      <Mesh Name="rock_5.mesh" Id="5" Filename="rock_5.mesh"/>
+      <Mesh Name="rock_10.mesh" Id="6" Filename="rock_10.mesh"/>
+      <Mesh Name="rock_16.mesh" Id="7" Filename="rock_16.mesh"/>
+      <Mesh Name="rock_19.mesh" Id="8" Filename="rock_19.mesh"/>
+      <Mesh Name="weed_4.mesh" Id="12" Filename="weed_4.mesh"/>
+      <Mesh Name="palm1.3ds" Id="13" Filename="palm1.3ds"/>
+   </CachedMeshGroup>
+</CachedMeshGroups>
+<SceneLayers Count="1">
+   <SceneLayer Name="unsorted" Count="42" DrawDistance="0.000000">
+      <SceneMesh Name="rock_1.mesh" CachedMeshId="2" Coords="Euler" Matrix="1.842787,0.000000,0.000000,0.000000,0.000000,1.842787,0.000000,0.000000,0.000000,0.000000,1.842787,0.000000,153.428528,6.897462,186.977188,1.000000"/>
+      <SceneMesh Name="rock_3.mesh" CachedMeshId="3" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,151.046204,5.737404,191.441147,1.000000"/>
+      <SceneMesh Name="rock_3.mesh" CachedMeshId="3" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,148.149460,4.159279,185.647552,1.000000"/>
+      <SceneMesh Name="rock_4.mesh" CachedMeshId="4" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,149.886108,5.882183,192.912369,1.000000"/>
+      <SceneMesh Name="rock_4.mesh" CachedMeshId="4" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,152.086929,6.503753,195.700516,1.000000"/>
+      <SceneMesh Name="rock_4.mesh" CachedMeshId="4" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,152.837280,6.558441,194.880768,1.000000"/>
+      <SceneMesh Name="rock_5.mesh" CachedMeshId="5" Coords="Euler" Matrix="0.515038,0.000000,0.857168,0.000000,0.000000,1.000000,0.000000,0.000000,-0.857168,0.000000,0.515038,0.000000,160.239960,9.073087,199.192963,1.000000"/>
+      <SceneMesh Name="rock_5.mesh" CachedMeshId="5" Coords="Euler" Matrix="0.922429,-0.190809,0.335737,0.000000,0.179302,0.981628,0.065261,0.000000,-0.342020,0.000000,0.939693,0.000000,159.818329,9.252774,201.528320,1.000000"/>
+      <SceneMesh Name="rock_5.mesh" CachedMeshId="5" Coords="Euler" Matrix="0.759549,-0.347547,0.549818,0.000000,0.309017,0.936608,0.165149,0.000000,-0.572361,0.044464,0.818797,0.000000,161.608246,9.244963,198.082413,1.000000"/>
+      <SceneMesh Name="rock_10.mesh" CachedMeshId="6" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,145.692383,5.688036,198.167603,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,138.879974,5.230186,202.471771,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,136.291168,4.761436,203.592560,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,137.726227,5.105186,206.016907,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,140.027512,5.386436,209.554123,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,135.571838,4.550499,210.401443,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,143.431152,4.941124,194.400681,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,146.431702,0.284874,161.540161,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,151.961349,4.972374,173.848053,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,159.280334,5.433311,164.265442,1.000000"/>
+      <SceneMesh Name="rock_19.mesh" CachedMeshId="8" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,159.280334,5.433311,164.265442,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.201519,0.000000,1.288470,0.000000,0.000000,1.761760,0.000000,0.000000,-1.288470,0.000000,1.201519,0.000000,131.704651,-0.373736,176.282364,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.060254,0.000000,-1.407004,0.000000,0.000000,1.761760,0.000000,0.000000,1.407004,0.000000,1.060254,0.000000,126.072250,-0.037889,182.740417,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,136.895920,-1.014549,182.787033,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.155820,0.000000,1.329618,0.000000,0.000000,1.761760,0.000000,0.000000,-1.329618,0.000000,1.155820,0.000000,134.194748,1.223456,190.637756,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="2.480638,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,2.480638,0.000000,131.141464,0.761789,192.507034,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,139.229767,3.747014,195.080246,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.201519,0.000000,1.288470,0.000000,0.000000,1.761760,0.000000,0.000000,-1.288470,0.000000,1.201519,0.000000,137.560608,0.535956,152.340225,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.060254,0.000000,-1.407004,0.000000,0.000000,1.761760,0.000000,0.000000,1.407004,0.000000,1.060254,0.000000,131.928207,0.535956,158.798279,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,142.751862,0.535956,158.844894,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.155820,0.000000,1.329618,0.000000,0.000000,1.761760,0.000000,0.000000,-1.329618,0.000000,1.155820,0.000000,140.050690,0.535956,166.695618,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="2.480638,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,2.480638,0.000000,136.997421,0.535956,168.564896,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,145.085724,0.397966,171.138107,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.201519,0.000000,1.288470,0.000000,0.000000,1.761760,0.000000,0.000000,-1.288470,0.000000,1.201519,0.000000,106.272598,1.871893,149.441910,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.060254,0.000000,-1.407004,0.000000,0.000000,1.761760,0.000000,0.000000,1.407004,0.000000,1.060254,0.000000,100.640198,4.575018,155.899963,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,111.463844,0.535956,155.946579,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.155820,0.000000,1.329618,0.000000,0.000000,1.761760,0.000000,0.000000,-1.329618,0.000000,1.155820,0.000000,108.762672,0.535956,163.797302,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="2.480638,0.000000,0.000000,0.000000,0.000000,1.761760,0.000000,0.000000,0.000000,0.000000,2.480638,0.000000,105.709412,0.551581,165.666580,1.000000"/>
+      <SceneMesh Name="rock_16.mesh" CachedMeshId="7" Coords="Euler" Matrix="1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,113.797684,0.304216,168.239792,1.000000"/>
+      <SceneMesh Name="palm1.3ds" CachedMeshId="13" Coords="Euler" Matrix="0.205267,0.000000,-0.355533,0.000000,0.000000,0.410534,0.000000,0.000000,0.355533,0.000000,0.205267,0.000000,148.624786,6.490280,201.904938,1.000000"/>
+      <SceneMesh Name="palm1.3ds" CachedMeshId="13" Coords="Euler" Matrix="0.205267,0.000000,-0.355533,0.000000,0.000000,0.410534,0.000000,0.000000,0.355533,0.000000,0.205267,0.000000,158.624619,6.760812,185.163635,1.000000"/>
+      <SceneMesh Name="palm1.3ds" CachedMeshId="13" Coords="Euler" Matrix="0.205267,0.000000,-0.355533,0.000000,0.000000,0.410534,0.000000,0.000000,0.355533,0.000000,0.205267,0.000000,146.541214,6.456124,209.363220,1.000000"/>
+      <SceneMesh Name="palm1.3ds" CachedMeshId="13" Coords="Euler" Matrix="0.205267,0.000000,-0.355533,0.000000,0.000000,0.410534,0.000000,0.000000,0.355533,0.000000,0.205267,0.000000,162.950012,6.838937,178.240799,1.000000"/>
+   </SceneLayer>
+</SceneLayers>
+<EntityTypes Count="0">
+</EntityTypes>
+<Entities Count="0">
+</Entities>
+<SKYMESH Type="SkyBox" Radius="5.000000" Position="2.500000,2.400000,2.500000" Scale="1.000000,0.500000,1.000000" TexUp="E:\Stuff\Media\Sky3\up.bmp" TexDown="-1" TexFront="E:\Stuff\Media\Sky3\back.bmp" TexBack="E:\Stuff\Media\Sky3\front.bmp" TexLeft="E:\Stuff\Media\Sky3\right.bmp" TexRight="E:\Stuff\Media\Sky3\right.bmp"/>
+<Water Height="6.000000" Transparency="0.800000" Color="0.101961,0.572549,1.000000" MixColor="0.300000" Texture="E:\Stuff\Media\water2.bmp" ScaleU="0.050000" ScaleV="0.050000" Reflections="True" ReflectTerrain="True" ReflectSky="True" ReflectMeshes="True"/>
+</Freeworld3D>

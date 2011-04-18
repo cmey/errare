@@ -1,0 +1,14 @@
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<versions>
+	<version>
+		<nom>Numéro de version</nom>
+		<files>
+			<file>
+				<url>Chemin vers le fichier</url>
+				<destination>Destination relative</destination>
+			</file>
+		</files>
+	</version>
+</versions>
+

@@ -1,0 +1,23 @@
+<world>
+	<object name="001" type="character" mainchar="true">
+		<physics>
+			<x>0</x>
+			<y>100</y>
+			<z>0</z>
+			<xsize>30</xsize>
+			<ysize>30</ysize>
+			<zsize>30</zsize>
+		</physics>
+		
+		<graphics>
+			<path>data/md2/hobgoblin/hobgoblin.md2</path>
+		</graphics>
+	</object>
+	
+	<object name="002" type="setting">
+		<graphics>
+			<path>pathtoterrain.3ds</path>
+		</graphics>
+	</object>
+
+</world>

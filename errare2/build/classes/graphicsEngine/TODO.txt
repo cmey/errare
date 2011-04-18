@@ -1,0 +1,10 @@
+- un module pour afficher juste le personnage en 3D dans l'�quipement.
+  perso + �quipement + effets associ�s (flamme sur �p�e)
+  pas de sol, pas de ciel
+  fond transparent
+  
+  - A la creation, on genere un enorme terrain du monde. Un algo découpe le terrain en patches.
+  Un algo simplifie les patches.
+  Un algo crée la bounding box de chaque patch.
+  Kd-Tree : découper récursivement le terrain en paches jusqu'à avoir ~1000 triangles par
+  patch.

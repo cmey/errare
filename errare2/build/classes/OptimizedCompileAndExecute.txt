@@ -1,0 +1,8 @@
+COMPILE with optimisations : give the option "-o" to javac.
+   javac -o *.java
+   
+EXECUTE with optimisations : give the option "-server" to java.
+ java -server main/ClientMain
+For this (to have the server version), you need to use the JRE
+that comes with the JDK and not the standalone JRE.
+  
