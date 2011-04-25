@@ -14,8 +14,6 @@ GNU General Public License for more details.*/
 package physicsEngine;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import main.Rep;
 
 public class CubeTree extends Cube{
 	

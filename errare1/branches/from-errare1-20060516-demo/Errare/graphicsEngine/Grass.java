@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Grass extends GraphicalRep {
 
@@ -31,7 +33,7 @@ public class Grass extends GraphicalRep {
 	
 
 	
-	public void drawHerbe(GL gl, int px, int py, int pz, int rx, int ry, int rz) {
+	public void drawHerbe(GL2 gl, int px, int py, int pz, int rx, int ry, int rz) {
 		gl.glPushMatrix();
 		
 		//gl.glDisable(GL.GL_CULL_FACE);
@@ -44,8 +46,8 @@ public class Grass extends GraphicalRep {
 			//compiler herbe
 			if(!gl.glIsTexture(list_herbe))
 				list_herbe = gl.glGenLists(1);
-			gl.glNewList(list_herbe, GL.GL_COMPILE);
-			gl.glBegin(GL.GL_QUADS);
+			gl.glNewList(list_herbe, GL2.GL_COMPILE);
+			gl.glBegin(GL2.GL_QUADS);
 			gl.glTexCoord2f(0,0);gl.glVertex3d (0,0,0);
 			gl.glTexCoord2f(10,0);gl.glVertex3d (1000,0,0);
 			gl.glTexCoord2f(10,1);gl.glVertex3d (1000,15,0);
@@ -97,7 +99,7 @@ public class Grass extends GraphicalRep {
 
 
 	@Override
-	protected void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
+	protected void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
 		// TODO Auto-generated method stub
 		
 	}

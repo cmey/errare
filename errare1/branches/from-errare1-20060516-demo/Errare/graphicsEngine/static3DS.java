@@ -23,11 +23,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import javax.imageio.ImageIO;
-
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLU;
-import net.java.games.jogl.util.BufferUtils;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.glu.GLU;
 
 public class static3DS extends GraphicalRep {
 
@@ -44,13 +44,13 @@ public class static3DS extends GraphicalRep {
 	
 	
 	
-	private void loadFile3DS(String filePath, GLDrawable glDrawable) {
-		GL gl = glDrawable.getGL();
+	private void loadFile3DS(String filePath, GLAutoDrawable glDrawable) {
+		GL2 gl = glDrawable.getGL().getGL2();
 		Loader3DS loader=new Loader3DS();
 		loader.loadData(filePath);
 		if(!gl.glIsTexture(list))
 			list = gl.glGenLists(1);
-		gl.glNewList(list, GL.GL_COMPILE);
+		gl.glNewList(list, GL2.GL_COMPILE);
 		
 		charge3dsDansListe(glDrawable, loader);
 		
@@ -63,9 +63,9 @@ public class static3DS extends GraphicalRep {
 	/*Cette methode permet de charger le fichier 3ds du loader
 	 * et le met dans la liste list
 	 */
-	public void charge3dsDansListe(GLDrawable gLDrawable, Loader3DS loader){
+	public void charge3dsDansListe(GLAutoDrawable gLDrawable, Loader3DS loader){
 		
-		final GL gl = gLDrawable.getGL();
+		final GL2 gl = gLDrawable.getGL().getGL2();
 		
 		
 		
@@ -98,10 +98,10 @@ public class static3DS extends GraphicalRep {
 					if (materiel.color){
 						/*Les couleur peuvent �tre coder sous forme de bytes ou de float*/
 						if (materiel.enByte){
-							gl.glColor3ubv(materiel.RGBb);
+							gl.glColor3ubv(materiel.RGBb, 0);
 						}
 						else
-							gl.glColor3fv(materiel.RGB);
+							gl.glColor3fv(materiel.RGB, 0);
 					}
 					
 					
@@ -128,7 +128,7 @@ public class static3DS extends GraphicalRep {
 						gl.glTexCoord2f(mesh.mapCoordArray[font[0]].u, mesh.mapCoordArray[font[0]].v);
 					}
 					catch (ArrayIndexOutOfBoundsException e){}
-					gl.glVertex3fv(coordonnee);
+					gl.glVertex3fv(coordonnee, 0);
 					
 					//Second sommet
 					coordonnee = mesh.vertexArray[font[1]].array;
@@ -136,7 +136,7 @@ public class static3DS extends GraphicalRep {
 						gl.glTexCoord2f(mesh.mapCoordArray[font[1]].u, mesh.mapCoordArray[font[1]].v);
 					}
 					catch (ArrayIndexOutOfBoundsException e){}
-					gl.glVertex3fv(coordonnee);
+					gl.glVertex3fv(coordonnee, 0);
 					
 					//Troisieme sommet
 					coordonnee = mesh.vertexArray[font[2]].array;
@@ -144,7 +144,7 @@ public class static3DS extends GraphicalRep {
 						gl.glTexCoord2f(mesh.mapCoordArray[font[2]].u, mesh.mapCoordArray[font[2]].v);
 					}
 					catch (ArrayIndexOutOfBoundsException e){}
-					gl.glVertex3fv(coordonnee);
+					gl.glVertex3fv(coordonnee, 0);
 					
 				}
 				gl.glEnd();
@@ -160,8 +160,8 @@ public class static3DS extends GraphicalRep {
 	
 	/*Si la texture existe alors elle sera chargee comme texture courante
 	 * et on active l'utilisation de texture */
-	public void chargerTexture(GLDrawable gLDrawable,BufferedImage img, String laTexture){
-		final GL gl = gLDrawable.getGL();
+	public void chargerTexture(GLAutoDrawable gLDrawable,BufferedImage img, String laTexture){
+		final GL2 gl = gLDrawable.getGL().getGL2();
 		int texture;
 		/*Si il y a un probleme dans l'existence d'un fichier de texture
 		 Alors "existe" passera � false */
@@ -183,7 +183,7 @@ public class static3DS extends GraphicalRep {
 			texture = genTexture(gl);
 			gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
 			//On charge l'image
-			makeRGBTexture(gl, gLDrawable.getGLU(), img, GL.GL_TEXTURE_2D, false);
+			makeRGBTexture(gl, new GLU(), img, GL.GL_TEXTURE_2D, false);
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 			gl.glEnable(GL.GL_TEXTURE_2D);//On active l'utilisation de texture
@@ -194,9 +194,9 @@ public class static3DS extends GraphicalRep {
 	
 	
 	
-	private int genTexture(GL gl) {
+	private int genTexture(GL2 gl) {
 		final int[] tmp = new int[1];
-		gl.glGenTextures(1, tmp);
+		gl.glGenTextures(1, tmp, 0);
 		return tmp[0];
 	}
 	
@@ -232,13 +232,14 @@ public class static3DS extends GraphicalRep {
 			dest = ByteBuffer.allocateDirect(data.length);
 			dest.order(ByteOrder.nativeOrder());
 			dest.put(data, 0, data.length);
+			dest.rewind();
 			break;
 		}
 		case BufferedImage.TYPE_INT_RGB:
 		{
 			
 			int[] data = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-			dest = ByteBuffer.allocateDirect(data.length * BufferUtils.SIZEOF_INT);
+			dest = ByteBuffer.allocateDirect(data.length * 4);
 			dest.order(ByteOrder.nativeOrder());
 			dest.asIntBuffer().put(data, 0, data.length);
 			break;
@@ -250,11 +251,11 @@ public class static3DS extends GraphicalRep {
 		
 		if (mipmapped)
 		{
-			glu.gluBuild2DMipmaps(target, GL.GL_RGB8, img.getWidth(), img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, dest);
+			glu.gluBuild2DMipmaps(target, GL.GL_RGB8, img.getWidth(), img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, dest.rewind());
 		}
 		else
 		{
-			gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(), img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, dest);
+			gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(), img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, dest.rewind());
 		}
 	}
 	
@@ -289,9 +290,9 @@ public class static3DS extends GraphicalRep {
 	 * @param ry rotation over y axis
 	 * @param rz rotation over z axis
 	 */
-	public void draw(GLDrawable glDrawable, int px, int py, int pz, int rx, int ry, int rz)
+	public void draw(GLAutoDrawable glDrawable, int px, int py, int pz, int rx, int ry, int rz)
 	{
-		GL gl = glDrawable.getGL();
+		GL2 gl = glDrawable.getGL().getGL2();
 		if(prem) {
 			prem=false;
 			loadFile3DS(mesh_filename, glDrawable);
@@ -315,7 +316,7 @@ public class static3DS extends GraphicalRep {
 	}
 
 	@Override
-	public void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
+	public void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -14,16 +14,20 @@ GNU General Public License for more details.*/
 package gameEngine;
 
 
-import physicsEngine.*;
-import aiEngine.*;
+import graphicsEngine.MD2;
+import guiEngine.GuiRep;
 
-import graphicsEngine.*;
-import guiEngine.*;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Set;
 
-import java.awt.*;
-import java.util.*;
-
-import main.*;
+import main.HeroRep;
+import main.ItemRep;
+import main.Main;
+import physicsEngine.ItemPRep;
+import physicsEngine.PhysicalRep;
+import physicsEngine.PhysicsEngine;
+import aiEngine.ReseauNeural;
 
 /*
  * Created on 14 sept. 2005

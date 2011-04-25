@@ -15,7 +15,8 @@ package graphicsEngine;
 
 import java.nio.ByteBuffer;
 
-import net.java.games.jogl.GL;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 /**
  * Special effect called Glow. Today's fashion.
@@ -32,14 +33,14 @@ public class Glow {
 		internal_texture = new int[1];
 	}
 	
-	public void renderGlow(GL gl, int times, int pixel_offset){
+	public void renderGlow(GL2 gl, int times, int pixel_offset){
 		
 		if(gl.glIsTexture(internal_texture[0])){
-			gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+			gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 			//gl.glAlphaFunc(GL.GL_GREATER,0.3f);
 			//gl.glEnable(GL.GL_ALPHA_TEST);
 
-			gl.glDisable(GL.GL_ALPHA_TEST);
+			gl.glDisable(GL2.GL_ALPHA_TEST);
 	        float alpha = 0.1f;											// Starting Alpha Value
 	        float alphainc = alpha / times;								// Fade Speed For Alpha Blending
 	        alpha = 0;
@@ -49,11 +50,11 @@ public class Glow {
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture[0]);
 			
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			gl.glOrtho(0,GraphicsEngine.window_width,0,GraphicsEngine.window_height,-1,1);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			gl.glEnable(GL.GL_BLEND);
@@ -71,7 +72,7 @@ public class Glow {
 			gl.glVertex3f(GraphicsEngine.window_width,0,0);
 			gl.glEnd();
 			*/
-			gl.glBegin(GL.GL_QUADS);										// Begin Drawing Quads
+			gl.glBegin(GL2.GL_QUADS);										// Begin Drawing Quads
 	        float circle = 0f;
 			for (int num = 0; num < times; num++)						// Number Of Times To Render Blur
 			{
@@ -98,9 +99,9 @@ public class Glow {
 			
 			gl.glDisable(GL.GL_BLEND);
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);	
 			gl.glPopAttrib();
@@ -108,17 +109,17 @@ public class Glow {
 	}
 	
 	
-	public void readWindow(GL gl){
+	public void readWindow(GL2 gl){
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		if(!gl.glIsTexture(internal_texture[0])){
-			gl.glGenTextures(1, internal_texture);
+			gl.glGenTextures(1, internal_texture, 0);
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture[0]);
 			gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, glowSize, glowSize,
-					0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, glowData8Bit);
+					0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, glowData8Bit.rewind());
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
+			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
+			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
 		}
 		gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture[0]);		
 		

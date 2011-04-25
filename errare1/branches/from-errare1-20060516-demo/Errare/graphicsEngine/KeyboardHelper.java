@@ -16,8 +16,6 @@ package graphicsEngine;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import main.Main;
-
 public class KeyboardHelper implements KeyListener{	
 	
 	private boolean[] keys = new boolean[256];

@@ -15,8 +15,9 @@ package graphicsEngine;
 
 import java.awt.Point;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
 
 
 public abstract class Particles extends GraphicalRep {
@@ -34,9 +35,6 @@ public abstract class Particles extends GraphicalRep {
 		public float dist;
 		public float angle;
 	}
-	
-	
-	
 
 	public Particles(String rep3D_filename) {
 		super(rep3D_filename, GraphicalRep.FORMAT_PARTICLE);
@@ -56,18 +54,18 @@ public abstract class Particles extends GraphicalRep {
 	 * @param ry rotation over y axis
 	 * @param rz rotation over z axis
 	 */
-	protected void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
-		GL gl = gld.getGL();
+	protected void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
+		GL2 gl = gld.getGL().getGL2();
 		py+=40; 
 		px+=30;
 		gl.glPushMatrix();
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		doPosition(gl,obj_x-px,0,obj_z-pz,0,0,0);
 		gl.glTranslatef(px, py, pz);
 		gl.glRotatef(rx, 1, 0, 0);
 		gl.glRotatef(ry, 0, 1, 0);
 		gl.glRotatef(rz, 0, 0, 1);
-		gl.glEnable(GL.GL_ALPHA_TEST);
+		gl.glEnable(GL2.GL_ALPHA_TEST);
 		
 		//gl.glDisable(GL.GL_DEPTH_TEST);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_ONE); // Set The Blending Function For Translucency
@@ -87,7 +85,7 @@ public abstract class Particles extends GraphicalRep {
 		
 		gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_ONE_MINUS_SRC_ALPHA); 
 		gl.glDisable(GL.GL_BLEND);
-		gl.glDisable(GL.GL_ALPHA_TEST);
+		gl.glDisable(GL2.GL_ALPHA_TEST);
 		//gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glDepthMask(true);
 		
@@ -100,7 +98,7 @@ public abstract class Particles extends GraphicalRep {
 		obj_z=p.y;
 	}
 	
-	protected abstract void drawParticles(GL gl);
+	protected abstract void drawParticles(GL2 gl);
 	public abstract void tick();
 	public abstract void die();
 	public abstract void reset();

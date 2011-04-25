@@ -16,9 +16,11 @@ package graphicsEngine;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.StringTokenizer;
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 
 public class ERAtemp extends GraphicalRep{
@@ -190,8 +192,8 @@ public class ERAtemp extends GraphicalRep{
 	
 	
 	
-	public void draw(GLDrawable gld,float px, float py, float pz, float rx, float ry, float rz){
-		GL gl = gld.getGL();
+	public void draw(GLAutoDrawable gld,float px, float py, float pz, float rx, float ry, float rz){
+		GL2 gl = gld.getGL().getGL2();
 		gl.glPushMatrix();
 		doPosition(gl,px,py,pz,rx,ry,rz);
 		if(prem){

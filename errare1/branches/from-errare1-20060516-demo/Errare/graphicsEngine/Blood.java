@@ -14,7 +14,9 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLDrawable;
 
 public class Blood extends Particles{
 	private int how_many = 50;
@@ -36,7 +38,7 @@ public class Blood extends Particles{
 	}
 	
 	@Override
-	protected void drawParticles(GL gl) {
+	protected void drawParticles(GL2 gl) {
 		for(loop=num-1; loop>=0; loop--){               // Loop Through All The Stars
 			gl.glPushMatrix();    // Reset The View Before We Draw Each Star
 			gl.glRotatef(stars[loop].angle,0.0f,1.0f,0.0f);    // Rotate To The Current Stars Angle
@@ -47,7 +49,7 @@ public class Blood extends Particles{
 			gl.glRotatef(spin,0.0f,0.0f,1.0f);
 			Billboard(gl);
 			
-			gl.glBegin(GL.GL_QUADS);
+			gl.glBegin(GL2.GL_QUADS);
 			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-psize,-psize, 0.0f);
 			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( psize,-psize, 0.0f);
 			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( psize, psize, 0.0f);

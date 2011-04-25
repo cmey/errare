@@ -14,7 +14,6 @@ GNU General Public License for more details.*/
 package physicsEngine;
 
 import java.awt.Point;
-import java.util.Set;
 
 /**
  * @author trueblue

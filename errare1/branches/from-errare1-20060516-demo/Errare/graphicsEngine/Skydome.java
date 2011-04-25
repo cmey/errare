@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Skydome extends GraphicalRep{
 	
@@ -73,8 +75,8 @@ public class Skydome extends GraphicalRep{
 
 
 	@Override
-	protected void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
-		GL gl = gld.getGL();
+	protected void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
+		GL2 gl = gld.getGL().getGL2();
 		gl.glPushMatrix();
 		gl.glPushAttrib(GL.GL_TEXTURE_2D);
 		gl.glEnable(GL.GL_TEXTURE_2D);

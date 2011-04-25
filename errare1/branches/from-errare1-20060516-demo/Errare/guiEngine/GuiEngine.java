@@ -19,21 +19,26 @@ import gameEngine.Hero;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.glu.GLU;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import main.ItemRep;
 import main.Main;
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
-import net.java.games.jogl.util.GLUT;
 import physicsEngine.CharacterPRep;
 import soundEngine.SoundEngine;
+
+import com.jogamp.opengl.util.gl2.GLUT;
+
 import databaseEngine.DatabaseEngine;
 
 /**
@@ -128,13 +133,14 @@ public class GuiEngine {
 		
 		// Create Instances
 		texture = new int[NBTEXTURES];
-		actionBar = new ActionBar(this);
+		//actionBar = new ActionBar(this);
+		actionBar = new ActionBar();
 
 		// Set developpement to true
 		DEV = true ;
 
 		// Create a canvas to test alone
-		canvas = GLDrawableFactory.getFactory().createGLCanvas(new GLCapabilities());
+		canvas = new GLCanvas(new GLCapabilities(GLProfile.getDefault()));
 		
 		// Anonymous class (we must do that to test alone)
 		GLEventListener glevent = new GLEventListener() {
@@ -199,7 +205,8 @@ public class GuiEngine {
 		// Create Instances
 		texture = new int[NBTEXTURES];
 		this.main = main;
-		actionBar = new ActionBar(this);
+		//actionBar = new ActionBar(this);
+		actionBar = new ActionBar();
 
 		// Set developpement to false
 		DEV = false;
@@ -216,7 +223,7 @@ public class GuiEngine {
 	 * Initialize all for the developpement
 	 */
 	
-	public void initDev(GLDrawable gLDrawable) {
+	public void initDev(GLAutoDrawable gLDrawable) {
 		
 		// For the DEV mode
 		this.screenWidth = 1024;
@@ -228,19 +235,19 @@ public class GuiEngine {
 		// Create display lists
 		buildLists(gLDrawable);
 		
-		GL gl = gLDrawable.getGL();
+		GL2 gl = gLDrawable.getGL().getGL2();
 		
 		// OpenGL Initialisation
-		gl.glShadeModel(GL.GL_SMOOTH);
+		gl.glShadeModel(GL2.GL_SMOOTH);
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL.GL_LEQUAL); // The Type Of Depth Testing To Do
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glAlphaFunc(GL.GL_GREATER,0.1f);
-		gl.glEnable(GL.GL_ALPHA_TEST);
+		gl.glEnable(GL2.GL_ALPHA_TEST);
 		gl.glClearDepth(1.0f);	// Depth Buffer Setup
 		gl.glClearStencil(0);	// Clear The Stencil Buffer To 0
-		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);	// Perspective Calculations
+		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);	// Perspective Calculations
 		
 	}
 	
@@ -279,24 +286,24 @@ public class GuiEngine {
 	 * Set objects in the right position
 	 **/
 	
-	public void glBeginOrtho(GLDrawable gLDrawable) {
+	public void glBeginOrtho(GLAutoDrawable gLDrawable) {
 		
-		GL gl = gLDrawable.getGL();
-		GLU glu = gLDrawable.getGLU();
+		GL2 gl = gLDrawable.getGL().getGL2();
+		GLU glu = new GLU();
 		
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
 		
 		// The left lower corner (0,0) will be attached with that one of the window 
 		glu.gluOrtho2D(
-				0, (int) gLDrawable.getSize().getWidth(),
-				0, (int) gLDrawable.getSize().getHeight());
+				0, (int) gLDrawable.getWidth(),
+				0, (int) gLDrawable.getHeight());
 		
 		// Set the point of creation of the image in the left higher corner
 		gl.glScaled(1,-1,1);
 		
 		// met le repère en haut à gauche
-		gl.glTranslatef(0,-(int) gLDrawable.getSize().getHeight(),0); 
+		gl.glTranslatef(0,-(int) gLDrawable.getHeight(),0); 
 		
 	}
 	
@@ -309,15 +316,15 @@ public class GuiEngine {
 	 * Is used to post text on the screen
 	 **/
 	
-	void glText(GLDrawable gLDrawable, String str, int x, int y) {
+	void glText(GLAutoDrawable gLDrawable, String str, int x, int y) {
 		
-		final GL gl = gLDrawable.getGL();
+		final GL2 gl = gLDrawable.getGL().getGL2();
 		
 		/* Specify the point running of drawing for the operations on the pixels 
 		 +18 = the height of the policy */
 		gl.glRasterPos2i(x, y+18); 
 		
-		new GLUT().glutBitmapString(gl, GLUT.BITMAP_HELVETICA_18, str);
+		new GLUT().glutBitmapString(GLUT.BITMAP_HELVETICA_18, str);
 		
 	}
 	
@@ -327,9 +334,9 @@ public class GuiEngine {
 	 * Display all graphics users interfaces in the right places
 	 */
 	
-	public void displayGUI(GLDrawable gLDrawable){
+	public void displayGUI(GLAutoDrawable gLDrawable){
 		
-		GL gl = gLDrawable.getGL();
+		GL2 gl = gLDrawable.getGL().getGL2();
 		
 		// If we test we must clear the buffer
 		if (DEV){
@@ -342,12 +349,12 @@ public class GuiEngine {
 		// Initialise the environnement (position)
 		glBeginOrtho(gLDrawable);
 		
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glPushMatrix();
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glPushMatrix();
 		
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		
@@ -364,16 +371,16 @@ public class GuiEngine {
 		// Update Statistics
 		updateStatistics();
 		
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		
 		// Display the interface
-		gl.glCallList(statisticsNum); 
+//		gl.glCallList(statisticsNum); 
 		
 		// Set the life
 		gl.glPushMatrix();
 		gl.glColor3f(1.0f,0.0f,0.0f);
 		gl.glTranslated(screenWidth-148,55,0);
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glVertex2i(0,0);
 		gl.glVertex2d(pourcentageLife*1.32,0);
 		gl.glVertex2d(pourcentageLife*1.32,14);
@@ -385,7 +392,7 @@ public class GuiEngine {
 		gl.glPushMatrix();
 		gl.glColor3f(0.0f,0.0f,1.0f);
 		gl.glTranslated(screenWidth-148,74,0);
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glVertex2i(0,0);
 		gl.glVertex2d(pourcentageMana*1.32,0);
 		gl.glVertex2d(pourcentageMana*1.32,15);
@@ -397,7 +404,7 @@ public class GuiEngine {
 		gl.glPushMatrix();
 		gl.glColor3f(0.0f,1.0f,0.0f);
 		gl.glTranslated(screenWidth-250,75,0);
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glVertex2i(0,0);
 		gl.glVertex2d(pourcentageLevel*0.68,0);
 		gl.glVertex2d(pourcentageLevel*0.68,12);
@@ -411,7 +418,7 @@ public class GuiEngine {
 		/* ----- BELT ------ */
 		
 		// Display the interface
-		gl.glCallList(beltNum);
+//		gl.glCallList(beltNum);
 		
 		
 		/* -- POTIONS -- */
@@ -2121,1127 +2128,1127 @@ gl.glEndList();
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/infos.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[1]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/quest.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[2]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/characteristic.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[3]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/inventory.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[4]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/chat.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[5]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0101.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[6]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0102.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[7]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0103.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[8]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0104.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[9]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0105.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[10]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0106.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[11]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0107.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[12]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0108.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[13]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0109.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[14]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0201.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[15]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0202.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[16]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0203.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[17]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0204.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[18]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0205.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[19]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0206.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[20]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0207.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[21]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0208.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[22]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0209.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[23]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0301.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[24]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0302.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[25]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0303.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[26]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0304.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[27]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0305.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[28]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0306.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[29]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0307.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[30]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0308.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[31]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0309.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[32]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0401.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[33]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0402.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[34]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0403.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[35]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0404.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[36]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 
 		textureLoader.load_texture("data/images/gui/0405.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[37]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0406.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[38]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0407.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[39]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0408.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[40]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0409.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[41]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0501.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[42]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0502.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[43]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0503.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[44]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0504.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[45]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0505.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[46]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0506.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[47]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0507.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[48]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0508.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[49]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0509.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[50]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0601.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[51]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0602.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[52]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0603.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[53]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0604.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[54]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0605.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[55]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0606.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[56]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0607.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[57]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0608.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[58]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0609.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[59]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0701.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[60]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0702.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[61]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0703.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[62]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0704.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[63]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0705.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[64]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0706.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[65]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0707.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[66]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0708.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[67]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0709.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[68]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0801.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[69]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0802.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[70]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0803.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[71]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0804.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[72]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0805.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[73]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0806.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[74]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0807.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[75]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0808.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[76]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0809.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[77]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0901.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[78]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0902.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[79]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0903.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[80]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0904.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[81]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0905.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[82]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0906.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[83]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0907.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[84]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0908.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[85]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/0909.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[86]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1001.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[87]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1002.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[88]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1003.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[89]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1004.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[90]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1005.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[91]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1006.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[92]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1007.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[93]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1008.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[94]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1009.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[95]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1101.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[22]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1102.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[23]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1103.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[24]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1104.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[25]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1105.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[26]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1106.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[27]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1107.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[28]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1108.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[29]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1109.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[30]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1201.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[31]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1202.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[32]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1203.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[33]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1204.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[34]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1205.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[35]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1206.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[36]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 
 		textureLoader.load_texture("data/images/gui/1207.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[37]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1208.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[38]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1209.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[39]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1301.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[40]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1302.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[41]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1303.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[42]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1304.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[43]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1305.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[44]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1306.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[45]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1307.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[46]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1308.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[47]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1309.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[48]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1401.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[49]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1402.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[50]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1403.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[51]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1403.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[52]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1404.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[53]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1405.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[54]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1406.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[55]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1407.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[56]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1408.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[57]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1409.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[58]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1501.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[59]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1502.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[60]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1503.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[61]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1504.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[62]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1504.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[63]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1505.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[64]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1506.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[65]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1507.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[66]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1508.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[67]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1509.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[68]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1601.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[69]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1602.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[70]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1603.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[71]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1604.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[72]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1605.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[73]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1606.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[74]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1607.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[75]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1608.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[76]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1609.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[77]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1701.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[78]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1702.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[79]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1603.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[71]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1704.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[72]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1705.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[73]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1706.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[74]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1707.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[75]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1708.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[76]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		textureLoader.load_texture("data/images/gui/1709.png");
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture[77]);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, textureLoader.getTWidth(), textureLoader.getTHeight(),
-				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture());
+				0,GL.GL_RGBA,GL.GL_UNSIGNED_BYTE, textureLoader.getTexture().rewind());
 		
 		System.out.println("... loading finished !");
 		

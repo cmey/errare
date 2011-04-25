@@ -40,35 +40,35 @@ public class NetworkClient {
 	
 	public NetworkClient(Main main, String server, int port) throws UnknownHostException, IOException {
 		this.main=main;
-		System.out.println("Solving host..."+server+" port "+port);
+		System.out.print("Client: Solving host..."+server+" port "+port);
 		socket = new Socket(InetAddress.getLocalHost(), port);
-		System.out.println("Solved");
+		System.out.println("...solved");
 		connectToServer();
 	}
 
 	public void connectToServer() throws IOException {
 		
-		System.out.println("Connecting...");
+		System.out.println("Client: Connecting...");
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream(socket.getInputStream());
-		System.out.println("Connected");
+		System.out.println("Client: Connected");
 		
-		System.out.println("Receiving initialisation data");
+		System.out.println("Client: Receiving initialisation data");
 		int seed = in.readInt();
-		System.out.println("seed="+seed);
+		System.out.println("Client: seed="+seed);
 		main.setRandom(new Random(seed));
 		nbai = in.readInt();
-		System.out.println("nbai="+nbai);
+		System.out.println("Client: nbai="+nbai);
 		nbplayers = in.readInt();
-		System.out.println("nbplayers="+nbplayers);
+		System.out.println("Client: nbplayers="+nbplayers);
 		id = in.readInt();
-		System.out.println("id="+id);
-		System.out.println("Received, sending ready");
+		System.out.println("Client: id="+id);
+		System.out.println("Client: Received, sending ready");
 		out.writeBoolean(true);
 		out.flush();
 		in.readBoolean();
-		System.out.println("Game start !");
-		wt=new WaitingThread();
+		System.out.println("Client: Game start !");
+		wt=new WaitingThread("Client: networkclient waiting thread");
 		wt.start();
 	}
 	
@@ -116,6 +116,10 @@ public class NetworkClient {
 	private class WaitingThread extends Thread{
 		
 		private boolean ack;
+		
+		public WaitingThread(String name) {
+			super(name);
+		}
 
 		public void run(){
 			Object nm;
@@ -132,7 +136,7 @@ public class NetworkClient {
 						
 					}
 				} catch (IOException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}

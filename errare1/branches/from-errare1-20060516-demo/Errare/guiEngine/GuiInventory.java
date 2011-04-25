@@ -15,10 +15,8 @@ package guiEngine;
 
 import java.awt.Rectangle;
 
-import physicsEngine.CharacterPRep;
-
-import main.CharacterRep;
 import main.ItemRep;
+import physicsEngine.CharacterPRep;
 
 
 /**

@@ -20,15 +20,19 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
+import jogamp.opengl.windows.wgl.GPU_DEVICE;
 
 public class Skybox implements GLEventListener, Runnable{
 	private static GLCanvas canvas;
@@ -75,52 +79,52 @@ public class Skybox implements GLEventListener, Runnable{
 	 * Here we put the basic settings that will only be called once.
 	 * @param glDrawable
 	 */
-	public void init(GLDrawable glDrawable) {
-		GL gl = glDrawable.getGL();
+	public void init(GLAutoDrawable glDrawable) {
+		GL2 gl = glDrawable.getGL().getGL2();
 		//gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		//gl.glShadeModel(GL.GL_FASTEST);
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		
 		textures = new int[6];
-		gl.glGenTextures(6, textures);
+		gl.glGenTextures(6, textures, 0);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture1);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture1.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[1]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture2);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture2.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[2]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture3);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture3.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[3]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture4);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture4.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[4]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture5);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture5.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[5]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture6);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture6.rewind());
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 		
 		if(!gl.glIsList(skyboxList))
 			skyboxList = gl.glGenLists(1);
-		gl.glNewList(skyboxList, GL.GL_COMPILE);
+		gl.glNewList(skyboxList, GL2.GL_COMPILE);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
 		
 		//face
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (-1,-1,-0.999); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (1,-1,-0.999); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (1,1,-0.999); 
@@ -130,7 +134,7 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[1]);
 		
 		//gauche
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (-0.999,-1,1); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (-0.999,-1,-1); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (-0.999,1,-1); 
@@ -140,7 +144,7 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[2]);
 		
 		//fond
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (1,-1,0.999); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (-1,-1,0.999); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (-1,1,0.999); 
@@ -150,7 +154,7 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[3]);
 		
 		//droite
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (0.999,-1,-1); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (0.999,-1,1); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (0.999,1,1); 
@@ -160,7 +164,7 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[4]);
 		
 		//haut
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (-1,0.999,-1); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (1,0.999,-1); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (1,0.999,1); 
@@ -170,7 +174,7 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[5]);
 		
 		//bas
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2i(0,1);gl.glVertex3d (-1,-0.999,-1); 
 		gl.glTexCoord2i(1,1);gl.glVertex3d (-1,-0.999,1); 
 		gl.glTexCoord2i(1,0);gl.glVertex3d (1,-0.999,1); 
@@ -180,8 +184,8 @@ public class Skybox implements GLEventListener, Runnable{
 		
 	}
 	
-	public void display(GLDrawable glDrawable) {
-		GL gl = glDrawable.getGL();
+	public void display(GLAutoDrawable glDrawable) {
+		GL2 gl = glDrawable.getGL().getGL2();
 		
 		if(TEST)
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -201,16 +205,16 @@ public class Skybox implements GLEventListener, Runnable{
 		gl.glPopMatrix();
 	}
 	
-	public void reshape(GLDrawable glDrawable, int i, int i1, int i2, int i3) {
-		GL gl = glDrawable.getGL();
-		GLU glu = glDrawable.getGLU();
+	public void reshape(GLAutoDrawable glDrawable, int i, int i1, int i2, int i3) {
+		GL2 gl = glDrawable.getGL().getGL2();
+		GLU glu = new GLU();
 		
 		int width = canvas.getWidth();
 		int height = canvas.getHeight();
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
 		glu.gluPerspective(60,(float)width/(float)height,0.1,100); 
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		
 	}
@@ -244,7 +248,7 @@ public class Skybox implements GLEventListener, Runnable{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return texture;
+		return (ByteBuffer) texture.rewind();
 	}
 	
 
@@ -282,10 +286,11 @@ public class Skybox implements GLEventListener, Runnable{
 			jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			Skybox sb=new Skybox(true);
 			
-			GLCapabilities capabilities = new GLCapabilities();
+			GLProfile glprofile = GLProfile.getDefault();
+			GLCapabilities capabilities = new GLCapabilities(glprofile);
 			capabilities.setHardwareAccelerated(true);      //We want hardware acceleration
 			capabilities.setDoubleBuffered(true);           //And double buffering
-			canvas = GLDrawableFactory.getFactory().createGLCanvas(capabilities);
+			canvas = new GLCanvas(capabilities);
 			
 			canvas.addGLEventListener(sb);
 			
@@ -308,6 +313,12 @@ public class Skybox implements GLEventListener, Runnable{
 				
 			}
 		}
+
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	
 }

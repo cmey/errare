@@ -13,11 +13,8 @@ GNU General Public License for more details.*/
 
 package main;
 
-import physicsEngine.ItemPRep;
-import physicsEngine.SettingPRep;
-import gameEngine.ItemCharacteristics;
 import graphicsEngine.GraphicalRep;
-import guiEngine.GuiRep;
+import physicsEngine.SettingPRep;
 
 /** 
  * Class which manage the characters

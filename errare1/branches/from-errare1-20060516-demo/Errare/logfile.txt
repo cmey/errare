@@ -135,4 +135,50 @@ GraphicsEngine: animation in data/md2/insect/tris.md2 not found: run
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/insect/tris.md2 not found: stand
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/insect/tris.md2 not found: run
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/insect/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.GraphicsEngine: Supported: max 128x128  yours: 500x500GraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
  debug pour chris: startFound=false endFound=true

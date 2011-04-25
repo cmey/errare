@@ -15,8 +15,6 @@ package guiEngineLaunch;
 
 import graphicsEngine.Skybox;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JPanel;
 
 public class GuiSkybox extends JPanel implements Runnable {

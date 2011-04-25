@@ -13,7 +13,7 @@ GNU General Public License for more details.*/
 
 package aiEngine;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class CoucheDeNeurone {
 	

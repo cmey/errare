@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import main.Rep;
+
 import javax.imageio.ImageIO;
-import net.java.games.jogl.GL;
-import physicsEngine.CharacterPRep;
-import physicsEngine.PhysicalRep;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 
 /**
@@ -142,14 +140,14 @@ public class LoadTexture{
 		System.exit(-1);
 	}
 	
-	protected void doPosition(GL gl, float px, float py, float pz, float rx, float ry, float rz){
+	protected void doPosition(GL2 gl, float px, float py, float pz, float rx, float ry, float rz){
 		gl.glTranslatef(px, py, pz);
 		gl.glRotatef(rx, 1, 0, 0);
 		gl.glRotatef(ry, 0, 1, 0);
 		gl.glRotatef(rz, 0, 0, 1);
 	}
 	
-	protected void doExpandTexture(GL gl){
+	protected void doExpandTexture(GL2 gl){
 		if(!tc.containsKey(texture_filename)) {
 			
 			System.exit(-1);
@@ -160,13 +158,13 @@ public class LoadTexture{
 			internal_texture1=tc.get(texture_filename).internal_index;
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 		}else{
-			gl.glGenTextures(1, internal_texture1);
+			gl.glGenTextures(1, internal_texture1, 0);
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 			
 			if(isAlphaTextured)
-				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, tWidth, tHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture);
+				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, tWidth, tHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture.rewind());
 			else
-				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture);
+				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.rewind());
 			
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -245,7 +243,7 @@ public class LoadTexture{
 			}
 		}
 		
-		return texture;
+		return (ByteBuffer) texture.rewind();
 	}
 	
 	

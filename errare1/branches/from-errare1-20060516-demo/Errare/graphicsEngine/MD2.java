@@ -19,10 +19,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedList;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLU;
-import net.java.games.jogl.GLUquadric;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUquadric;
 
 public class MD2 extends GraphicalRep {
 	
@@ -611,10 +613,10 @@ public class MD2 extends GraphicalRep {
 	 * @param rz rotation over z axis
 	 */
 	public static boolean forward; /* advance in animation ? */
-	public void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz)
+	public void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz)
 	{
-		GL gl = gld.getGL();
-		GLU glu = gld.getGLU();
+		GL2 gl = gld.getGL().getGL2();
+		GLU glu = new GLU();
 		
 		gl.glPushMatrix();
 		
@@ -656,7 +658,7 @@ public class MD2 extends GraphicalRep {
 			if(!gl.glIsList(frame.displaylist)){
 				frame.displaylist = gl.glGenLists(1);
 			}
-			gl.glNewList(frame.displaylist,GL.GL_COMPILE);
+			gl.glNewList(frame.displaylist,GL2.GL_COMPILE);
 			gl.glBegin(GL.GL_TRIANGLES);
 			for (int i = 0; i < indices.length; i++)
 			{
@@ -686,10 +688,10 @@ public class MD2 extends GraphicalRep {
 		}
 		
 		if(GraphicsEngine.keyboardHelper.draw_culling){
-			gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+			gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 			gl.glDisable(GL.GL_TEXTURE_2D);
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glDisable(GL.GL_ALPHA_TEST);
+			gl.glDisable(GL2.GL_ALPHA_TEST);
 			gl.glColor4f(1f,0f,1f,0.05f);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glTranslatef(sphereCenter.X,sphereCenter.Y,sphereCenter.Z);

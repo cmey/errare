@@ -21,10 +21,14 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import main.Rep;
+
 import javax.imageio.ImageIO;
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
+
+import main.Rep;
 import physicsEngine.CharacterPRep;
 import physicsEngine.PhysicalRep;
 
@@ -35,7 +39,7 @@ import physicsEngine.PhysicalRep;
  */
 public abstract class GraphicalRep{
 	
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	protected String mesh_filename;
 	protected String texture_filename;
 	protected boolean isAlphaTextured;
@@ -196,6 +200,7 @@ public abstract class GraphicalRep{
 			texture1 = tc.get(filename).data;
 			tWidth = tc.get(filename).tWidth;
 			tHeight = tc.get(filename).tHeight;
+			isAlphaTextured = tc.get(filename).isalpha;
 			if(texture1==null) bad_texture("je get un texture1 null!!");
 		}else{				
 			
@@ -236,14 +241,14 @@ public abstract class GraphicalRep{
 		return physicalRep;
 	}
 	
-	protected void doPosition(GL gl, float px, float py, float pz, float rx, float ry, float rz){
+	protected void doPosition(GL2 gl, float px, float py, float pz, float rx, float ry, float rz){
 		gl.glTranslatef(px, py, pz);
 		gl.glRotatef(rx, 1, 0, 0);
 		gl.glRotatef(ry, 0, 1, 0);
 		gl.glRotatef(rz, 0, 0, 1);
 	}
 	
-	protected void doExpandTexture(GL gl){
+	protected void doExpandTexture(GL2 gl){
 		if(!tc.containsKey(texture_filename)) {
 			System.out.println("chris a fait une faute immonde lors du chargement de texture (from doExpandTexture)");
 			System.exit(-1);
@@ -255,13 +260,13 @@ public abstract class GraphicalRep{
 			internal_texture1=tc.get(texture_filename).internal_index;
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 		}else{
-			gl.glGenTextures(1, internal_texture1);
+			gl.glGenTextures(1, internal_texture1, 0);
 			gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 			
 			if(isAlphaTextured)
-				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, tWidth, tHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture1);
+				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, tWidth, tHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture1.rewind());
 			else
-				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture1);
+				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, tWidth, tHeight, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture1.rewind());
 			
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -272,9 +277,9 @@ public abstract class GraphicalRep{
 	}
 	
 	
-	static protected void Billboard(GL gl){
+	static protected void Billboard(GL2 gl){
 		/*********** BILLBOARDING ************/
-		gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, modelview);
+		gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
 		int i, j;
 		for( i=0; i<3; i++ ) 
 			for( j=0; j<3; j++ ) {
@@ -283,7 +288,7 @@ public abstract class GraphicalRep{
 				else
 					modelview[i*4+j] = 0.0f;
 			}
-		gl.glLoadMatrixf(modelview);
+		gl.glLoadMatrixf(modelview, 0);
 		/********** END OF BILLBOARDING *******/
 	}
 	
@@ -314,16 +319,16 @@ public abstract class GraphicalRep{
 	 * @param ry rotation on y axis
 	 * @param rz rotation on z axis
 	 */
-	protected abstract void draw(GLDrawable gld,float px, float py, float pz, float rx, float ry, float rz);
+	protected abstract void draw(GLAutoDrawable gld,float px, float py, float pz, float rx, float ry, float rz);
 	
-	protected void drawInLoop(GLDrawable gld,float px, float py, float pz, float rx, float ry, float rz){
+	protected void drawInLoop(GLAutoDrawable gld,float px, float py, float pz, float rx, float ry, float rz){
 		if(this.quadtree_hack_objnumber != quadtree_hack_loopnumber){
 			draw(gld,px,py,pz,rx,ry,rz);
 			this.quadtree_hack_objnumber = quadtree_hack_loopnumber;
 		}
 	}
 	
-	protected void draw(GLDrawable gld){
+	protected void draw(GLAutoDrawable gld){
 		drawInLoop(gld,0,0,0,0,0,0);
 	}
 	
@@ -389,74 +394,12 @@ public abstract class GraphicalRep{
 		else
 			png_texture=false;
 		
-		ByteBuffer texture =null;
-		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(fn);
-		if(is==null){
-			bad_texture("file not found!");
-		}
-		BufferedImage buff = ImageIO.read(is);
-		java.awt.geom.AffineTransform tx = java.awt.geom.AffineTransform.getScaleInstance(1, -1); 
-		tx.translate(0, -buff.getHeight(null)); 
-		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR); 
-		buff = op.filter(buff, null);
-		tHeight = buff.getHeight();
-		tWidth = buff.getWidth();
-		if(tWidth <=1 || tHeight <=1){
-			bad_texture("Java returned an empty image buffer!");
-		}
-		if(!isPowerOfTwo(tWidth) || !isPowerOfTwo(tHeight)){
-			bad_texture("size non-power of 2 !");
-		}
-		Raster raster = buff.getRaster();
-		int[] img = null;
-		img = raster.getPixels(0, 0, tWidth, tHeight, img);
-		if(buff.getType()==BufferedImage.TYPE_CUSTOM ){
-			if(buff.getColorModel().hasAlpha()){
-			/* here we have a RGB (3 channels) + Alpha (1 channel) image */
-			isAlphaTextured=true;
-			texture = ByteBuffer.allocateDirect(tWidth * tHeight * 4);
-			for (int y=0; y<tHeight; y++)
-				for (int x=0; x<tWidth; x++) {
-					texture.put((byte) img[(y * tWidth + x) * 4 + 0]);
-					texture.put((byte) img[(y * tWidth + x) * 4 + 1]);
-					texture.put((byte) img[(y * tWidth + x) * 4 + 2]);
-					texture.put((byte) img[(y * tWidth + x) * 4 + 3]);
-				}
-			}else{
-				/* ordinary RGB image */
-				/** TODO or unsupported file format! */
-				texture = ByteBuffer.allocateDirect(tWidth * tHeight * 3);
-				for (int y=0; y<tHeight; y++)
-					for (int x=0; x<tWidth; x++) {
-						texture.put((byte) img[(y * tWidth + x) * 3 + 0]);
-						texture.put((byte) img[(y * tWidth + x) * 3 + 1]);
-						texture.put((byte) img[(y * tWidth + x) * 3 + 2]);
-					}
-			}
-		}else{
-			/* no alpha channel */
-			isAlphaTextured=false;
-			if(buff.getType()==BufferedImage.TYPE_BYTE_GRAY){
-				/* a level-of-gray image (only 1 channel) */
-				texture = ByteBuffer.allocateDirect(tWidth * tHeight * 1);
-				for (int y=0; y<tHeight; y++)
-					for (int x=0; x<tWidth; x++) {
-						texture.put((byte) img[(y * tWidth + x)]);
-					}
-			}else{
-				/* ordinary RGB image */
-				/** TODO or unsupported file format! */
-				texture = ByteBuffer.allocateDirect(tWidth * tHeight * 3);
-				for (int y=0; y<tHeight; y++)
-					for (int x=0; x<tWidth; x++) {
-						texture.put((byte) img[(y * tWidth + x) * 3 + 0]);
-						texture.put((byte) img[(y * tWidth + x) * 3 + 1]);
-						texture.put((byte) img[(y * tWidth + x) * 3 + 2]);
-					}
-			}
-		}
+		Texture tex = new Texture(fn);
+		isAlphaTextured = tex.isAlpha;
+		tWidth = tex.tWidth;
+		tHeight = tex.tHeight;
 		
-		return texture;
+		return tex.texturedata;
 	}
 	
 	

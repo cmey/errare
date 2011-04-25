@@ -13,30 +13,16 @@ GNU General Public License for more details.*/
 
 package guiEngineLaunch;
 
-import graphicsEngine.GraphicsEngine;
-import graphicsEngine.Skybox;
-
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import physicsEngine.PhysicsEngine;
-
-import main.Main;
 
 @SuppressWarnings("serial")
 

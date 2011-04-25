@@ -15,10 +15,6 @@ package guiEngine;
 
 import javax.swing.JFrame;
 
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawableFactory;
-
 /**
  * To Test only the guiEngine
  */

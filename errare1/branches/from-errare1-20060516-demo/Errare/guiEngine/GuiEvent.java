@@ -14,7 +14,6 @@ GNU General Public License for more details.*/
 package guiEngine;
 
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

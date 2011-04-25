@@ -13,11 +13,12 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import java.awt.Point;
+import java.nio.IntBuffer;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLU;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.glu.GLU;
 
 /**
  * A representation for the visualisation volume defined by 6 planes.
@@ -124,85 +125,76 @@ public class Frustum {
 	}
 
 
-	public boolean IsOccluded(Point3D p, GL gl, GLU glu)
+	public boolean IsOccluded(Point3D p, GL2 gl, GLU glu)
 	{
 		int [] viewport = new int[4];							// Space For Viewport Data
 		double [] mvmatrix = new double[16];					// Space For Transform Matrix
 		double[] projmatrix = new double[16];
-		double[] winx, winy, winz;						// Space For Returned Projected Coords
-		winx = new double[1];
-		winy = new double[1];
-		winz = new double[1];
+		double[] win = new double[3];;						// Space For Returned Projected Coords
+		
 		double flareZ;							// Here We Will Store The Transformed Flare Z
-		float[] bufferZ = new float[1];							// Here We Will Store The Read Z From The Buffer
+		IntBuffer bufferZ = IntBuffer.allocate(3);							// Here We Will Store The Read Z From The Buffer
 
-		gl.glGetIntegerv (GL.GL_VIEWPORT, viewport);					// Get Actual Viewport
-		gl.glGetDoublev (GL.GL_MODELVIEW_MATRIX, mvmatrix);				// Get Actual Model View Matrix
-		gl.glGetDoublev (GL.GL_PROJECTION_MATRIX, projmatrix);			// Get Actual Projection Matrix
+		gl.glGetIntegerv (GL.GL_VIEWPORT, viewport, 0);					// Get Actual Viewport
+		gl.glGetDoublev (GL2.GL_MODELVIEW_MATRIX, mvmatrix, 0);				// Get Actual Model View Matrix
+		gl.glGetDoublev (GL2.GL_PROJECTION_MATRIX, projmatrix, 0);			// Get Actual Projection Matrix
 
 		// This Asks OGL To Guess The 2D Position Of A 3D Point Inside The Viewport
 		glu.gluProject(
 				p.X, 
 				p.Y, 
 				p.Z, 
-				mvmatrix, 
-				projmatrix, 
-				viewport, 
-				winx, 
-				winy, 
-				winz);
-		flareZ = winz[0];
+				mvmatrix, 0,
+				projmatrix, 0,
+				viewport, 0,
+				win, 0);
+		flareZ = win[0];
 
 		// We Read Back One Pixel From The Depth Buffer (Exactly Where Our Flare Should Be Drawn)
-		gl.glReadPixels((int)winx[0], (int)winy[0],1,1,GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bufferZ);
+		gl.glReadPixels((int)win[0], (int)win[0],1,1,GL2.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bufferZ);
 
 		// If The Buffer Z Is Lower Than Our Flare Guessed Z Then Don't Draw
 		// This Means There Is Something In Front Of Our Flare
-		if (bufferZ[0] < flareZ)
+		if (bufferZ.get() < flareZ)
 			return true;
 		else
 			return false;
 	}
 
 	
-	public Point3D IsOccluded_Coords(Point3D p, GL gl, GLU glu)
+	public Point3D IsOccluded_Coords(Point3D p, GL2 gl, GLU glu)
 	{
 		int [] viewport = new int[4];							// Space For Viewport Data
 		double [] mvmatrix = new double[16];					// Space For Transform Matrix
 		double[] projmatrix = new double[16];
-		double[] winx, winy, winz;						// Space For Returned Projected Coords
-		winx = new double[1];
-		winy = new double[1];
-		winz = new double[1];
+		double[] win = new double[3];					// Space For Returned Projected Coords
 		double flareZ;							// Here We Will Store The Transformed Flare Z
-		float[] bufferZ = new float[1];							// Here We Will Store The Read Z From The Buffer
+		IntBuffer bufferZ = IntBuffer.allocate(3);							// Here We Will Store The Read Z From The Buffer
 
-		gl.glGetIntegerv (GL.GL_VIEWPORT, viewport);					// Get Actual Viewport
-		gl.glGetDoublev (GL.GL_MODELVIEW_MATRIX, mvmatrix);				// Get Actual Model View Matrix
-		gl.glGetDoublev (GL.GL_PROJECTION_MATRIX, projmatrix);			// Get Actual Projection Matrix
+		gl.glGetIntegerv (GL.GL_VIEWPORT, viewport, 0);					// Get Actual Viewport
+		gl.glGetDoublev (GL2.GL_MODELVIEW_MATRIX, mvmatrix, 0);				// Get Actual Model View Matrix
+		gl.glGetDoublev (GL2.GL_PROJECTION_MATRIX, projmatrix, 0);			// Get Actual Projection Matrix
 
 		// This Asks OGL To Guess The 2D Position Of A 3D Point Inside The Viewport
 		glu.gluProject(
 				p.X, 
 				p.Y, 
 				p.Z, 
-				mvmatrix, 
-				projmatrix, 
-				viewport, 
-				winx, 
-				winy, 
-				winz);
-		flareZ = winz[0];
+				mvmatrix, 0,
+				projmatrix, 0,
+				viewport, 0,
+				win, 0);
+		flareZ = win[0];
 
 		// We Read Back One Pixel From The Depth Buffer (Exactly Where Our Flare Should Be Drawn)
-		gl.glReadPixels((int)winx[0], (int)winy[0],1,1,GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bufferZ);
+		gl.glReadPixels((int)win[0], (int)win[1],1,1,GL2.GL_DEPTH_COMPONENT, GL.GL_FLOAT, bufferZ);
 
 		// If The Buffer Z Is Lower Than Our Flare Guessed Z Then Don't Draw
 		// This Means There Is Something In Front Of Our Flare
-		if (bufferZ[0] < flareZ)
+		if (bufferZ.get() < flareZ)
 			return null;
 		else
-			return new Point3D((int)winx[0], (int)winy[0], (int)(winz[0]));
+			return new Point3D((int)win[0], (int)win[1], (int)(win[2]));
 	}
 
 	
@@ -338,7 +330,7 @@ public class Frustum {
 	}
 	
 	private float[][] frustum = new float[6][4];
-	public void ExtractFrustum(GL gl)
+	public void ExtractFrustum(GL2 gl)
 	{
 	   float[]   proj = new float[16];
 	   float[]   modl = new float[16];
@@ -346,10 +338,10 @@ public class Frustum {
 	   float   t;
 
 	   /* Get the current PROJECTION matrix from OpenGL */
-	   gl.glGetFloatv( GL.GL_PROJECTION_MATRIX, proj );
+	   gl.glGetFloatv( GL2.GL_PROJECTION_MATRIX, proj, 0);
 
 	   /* Get the current MODELVIEW matrix from OpenGL */
-	   gl.glGetFloatv( GL.GL_MODELVIEW_MATRIX, modl );
+	   gl.glGetFloatv( GL2.GL_MODELVIEW_MATRIX, modl, 0);
 
 	   /* Combine the two matrices (multiply projection by modelview) */
 	   clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];

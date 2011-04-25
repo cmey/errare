@@ -17,7 +17,6 @@ package physicsEngine;
 import java.awt.Point;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * @author trueblue

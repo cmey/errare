@@ -14,8 +14,6 @@ GNU General Public License for more details.*/
 package guiEngine;
 
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.util.Hashtable;
 
 import javax.swing.ImageIcon;
 

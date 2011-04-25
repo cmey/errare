@@ -13,7 +13,6 @@ GNU General Public License for more details.*/
 
 package physicsEngine;
 
-import main.Rep;
 import main.SettingRep;
 
 

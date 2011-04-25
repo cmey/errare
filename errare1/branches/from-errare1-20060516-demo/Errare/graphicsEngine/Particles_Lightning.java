@@ -13,7 +13,8 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 public class Particles_Lightning extends Particles{
 
@@ -23,7 +24,7 @@ public class Particles_Lightning extends Particles{
 	}
 
 	@Override
-	protected void drawParticles(GL gl) {
+	protected void drawParticles(GL2 gl) {
 		
 		
 	}

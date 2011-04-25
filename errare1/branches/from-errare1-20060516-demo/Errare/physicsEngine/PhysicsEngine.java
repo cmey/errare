@@ -13,30 +13,15 @@ GNU General Public License for more details.*/
 
 package physicsEngine;
 
-import gameEngine.ItemCharacteristics;
-import graphicsEngine.GraphicalRep;
-import graphicsEngine.MD2;
-import guiEngine.GuiEngine;
-import guiEngine.GuiInventory;
-import guiEngine.GuiRep;
-
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
-
-import main.ItemRep;
 import main.Main;
-import main.Rep;
 
 
 /**
@@ -271,7 +256,8 @@ public class PhysicsEngine implements Runnable {
 	public void addMove(AStarMovement asm) {
 		if(asm.getChar()==mainChar) {
 			Point dest = asm.getDest();
-			main.getNetworkClient().addMove(mainChar, dest.x, dest.y);
+			if(null != main.getNetworkClient())
+				main.getNetworkClient().addMove(mainChar, dest.x, dest.y);
 		}
 		else {
 			if(charMoves.containsKey(asm.getChar()))

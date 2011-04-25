@@ -13,7 +13,8 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 public class Cinema {
 
@@ -33,16 +34,16 @@ public class Cinema {
 		cinema_on=false;
 	}
 	
-	public void draw_cinema(GL gl){
+	public void draw_cinema(GL2 gl){
 
 		MAX_CINEMA_SIZE = GraphicsEngine.window_height/8;
 		if(a_size>0){
 			gl.glDisable(GL.GL_DEPTH_TEST);
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			gl.glOrtho(0,GraphicsEngine.window_width,0,GraphicsEngine.window_height,-1,1);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			gl.glDisable(GL.GL_TEXTURE_2D);
@@ -52,9 +53,9 @@ public class Cinema {
 			gl.glColor3f(1,1,1);
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glEnable(GL.GL_DEPTH_TEST);
 		}	
 			if(cinema_on && a_size < MAX_CINEMA_SIZE)

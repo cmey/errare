@@ -16,20 +16,13 @@ package graphicsEngine;/**
  * Implements simple mouse rotation/zoom.
  */
 
-import guiEngine.GuiEngine;
-import guiEngine.GuiInventory;
-import guiEngine.GuiRep;
-
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import main.ItemRep;
-import net.java.games.jogl.GL;
-import physicsEngine.PhysicsEngine;
+import javax.media.opengl.GL;
 
 public class MouseHelper implements MouseListener, MouseMotionListener, MouseWheelListener
 {

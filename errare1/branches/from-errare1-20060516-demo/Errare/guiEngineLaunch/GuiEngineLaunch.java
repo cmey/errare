@@ -25,22 +25,19 @@ import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Toolkit;
 
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawableFactory;
-
-import databaseEngine.DatabaseEngine;
 
 import main.Main;
+import databaseEngine.DatabaseEngine;
 
 public class GuiEngineLaunch extends JFrame {
 	
@@ -72,10 +69,11 @@ public class GuiEngineLaunch extends JFrame {
 		
 	Skybox sb=new Skybox(true);
 	
-	GLCapabilities capabilities = new GLCapabilities();
+	GLProfile glprofile = GLProfile.getDefault();
+	GLCapabilities capabilities = new GLCapabilities(glprofile);
 	capabilities.setHardwareAccelerated(true);      //We want hardware acceleration
 	capabilities.setDoubleBuffered(true);           //And double buffering
-	GLCanvas canvas = GLDrawableFactory.getFactory().createGLCanvas(capabilities);
+	GLCanvas canvas = new GLCanvas(capabilities);
 	canvas.addGLEventListener(sb);
 	
 	canvas.setSize(1024,150);//We want the JPanel and the GLCanvas to have the same size

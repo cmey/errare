@@ -16,7 +16,6 @@ package guiEngineLaunch;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.MediaTracker;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;

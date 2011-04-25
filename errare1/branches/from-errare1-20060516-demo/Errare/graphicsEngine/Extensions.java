@@ -17,8 +17,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.Version;
+import javax.media.opengl.GL;
 
 public class Extensions {
 
@@ -78,7 +77,7 @@ public class Extensions {
 		System.out.println("Extensions: ");
 		for(int i=0;i<extensions.length;i++)
 			System.out.println(extensions[i]);
-		System.out.println("\nJOGL version: "+Version.getVersion());
+//		System.out.println("\nJOGL version: "+Version.getVersion());
 	}
 	
 	static public boolean write_info(){
@@ -91,7 +90,7 @@ public class Extensions {
 			bw.write("\nExtensions: ");
 			for(int i=0;i<extensions.length;i++)
 				bw.write("\n"+extensions[i]);
-			bw.write("\nJOGL version: "+Version.getVersion());
+//			bw.write("\nJOGL version: "+Version.getVersion());
 			bw.close();
 		} catch (IOException e) {
 			alright=false;

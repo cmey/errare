@@ -16,8 +16,10 @@ package graphicsEngine;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Sun extends GraphicalRep{
 	
@@ -39,8 +41,8 @@ public class Sun extends GraphicalRep{
 	}
 	
 	
-	public void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
-		GL gl = gld.getGL();
+	public void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
+		GL2 gl = gld.getGL().getGL2();
 		gl.glPushMatrix();
 		doPosition(gl,sunX, sunY, sunZ, 0,0,0);
 		
@@ -48,7 +50,7 @@ public class Sun extends GraphicalRep{
 			doExpandTexture(gl);
 			prem=false;
 		}
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 		//System.out.println(internal_texture[0]);
 		
@@ -58,7 +60,7 @@ public class Sun extends GraphicalRep{
 		Billboard(gl);
 		
 		
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-sunsize,-sunsize, 0.0f);
 		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( sunsize,-sunsize, 0.0f);
 		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( sunsize, sunsize, 0.0f);

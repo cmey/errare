@@ -22,25 +22,22 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
-
-import databaseEngine.DatabaseEngine;
 
 import networkEngine.NetworkClient;
 import networkEngine.NetworkServer;
-
 import physicsEngine.PhysicsEngine;
 import soundEngine.SoundEngine;
+import databaseEngine.DatabaseEngine;
 
 public class Main {
 	
-	private static final int PORT=1099; //port used for network communication
+	private static final int PORT=10990; //port used for network communication
+	private static final int NBAI=100; //default nbr of enemies
 	
 	public static final int GAMEENGINEFREQ=10;
 	public static final int PHYSICSENGINEFREQ=1;
@@ -62,19 +59,13 @@ public class Main {
 	public Main(String host, int port, JFrame jf) throws ParserConfigurationException, UnknownHostException, IOException, ClassNotFoundException {
 		
 		this.jf=jf;
-		/*jf.setUndecorated(true);
-		
-		GraphicsEnvironment env = GraphicsEnvironment.
-		 getLocalGraphicsEnvironment();
-		 GraphicsDevice[] devices = env.getScreenDevices();
-		 GraphicsDevice device = devices[0];
-		 
-		 
-		 device.setFullScreenWindow(jf);
-		 jf.validate();*/
 	
-		
-		networkClient = new NetworkClient(this, host, port);
+		try{
+			networkClient = new NetworkClient(this, host, port);
+		} catch (Exception e) {
+			e.printStackTrace();
+			setRandom(new Random());
+		}
 		soundEngine = new SoundEngine();
 		databaseEngine = new DatabaseEngine();
 		physicsEngine = new PhysicsEngine(this);
@@ -142,7 +133,8 @@ public class Main {
 				if(counter%GAMEENGINEFREQ==0)
 					gameEngine.run();
 				if(counter%NETWORKENGINEFREQ==0)
-					networkClient.run();
+					if(networkClient != null)
+						networkClient.run();
 				counter++;
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -164,9 +156,7 @@ public class Main {
 			if(levelOfDetail>100)
 				levelOfDetail=100;
 			else if(levelOfDetail<0)
-				levelOfDetail=0;
-			
-			
+				levelOfDetail=0;	
 		}
 		
 	}
@@ -217,24 +207,21 @@ public class Main {
 	 * @throws InterruptedException 
 	 */
 	public static void main(final String[] args) throws ParserConfigurationException, NumberFormatException, UnknownHostException, IOException, ClassNotFoundException, InterruptedException  {
+		Thread.currentThread().setName("main thread");
 		
 		JFrame jf = new JFrame();
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jf.setBounds(0, 0, 800, 600);
 		
 		if(args.length != 0 && args.length != 3){
-			System.out.println("USAGE: " +
-					"\n   java main.Main --client host port"
-					+"\n   java main.Main --server port nbplayers"
-					+"\n   java main.Main --dedicated port nbplayers");
-			System.exit(0);
+			usageExit();
 		}
 		
 		if(args.length==0) {
-			new Thread() {
+			new Thread("networkserver") {
 				public void run() {
 					try {
-						new NetworkServer(PORT, 1, 100);
+						new NetworkServer(PORT, 1, NBAI);
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 						System.exit(0);
@@ -244,15 +231,16 @@ public class Main {
 					}
 				}
 			}.start();
-			Thread.sleep(100);
-			new Main("localhost", PORT, jf);
+			Thread.sleep(1000);
+			
+			new Main("127.0.0.1", PORT, jf);
 			
 		}
 		else if(args[0].compareTo("--server")==0) {
-			new Thread() {
+			new Thread("networkserver") {
 				public void run() {
 					try {
-						new NetworkServer(Integer.parseInt(args[1]), Integer.parseInt(args[2]), 100);
+						new NetworkServer(Integer.parseInt(args[1]), Integer.parseInt(args[2]), NBAI);
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 						System.exit(0);
@@ -261,17 +249,14 @@ public class Main {
 						System.exit(0);
 					}
 				}
-			}.start();
-			Thread.sleep(100);
-			new Main("localhost", Integer.parseInt(args[1]), jf);
-			
+			}.start();			
 		}
 		else if(args[0].compareTo("--client")==0) {
 			new Main(args[1], Integer.parseInt(args[2]), jf);
 			
 		}
 		else if(args[0].compareTo("--dedicated")==0) {
-			new Thread() {
+			new Thread("networkserver") {
 				public void run() {
 					try {
 						new NetworkServer(Integer.parseInt(args[1]), Integer.parseInt(args[2]), 100);
@@ -285,14 +270,18 @@ public class Main {
 				}
 			}.start();
 		}
-		else {
-			System.out.println("USAGE: " +
-					"\nclient: java main.Main client host port"
-					+"\nserver: java main.Main server port nbplayers");
-			System.exit(0);
+		else { // wrong arguments
+			usageExit();
 		}
 	}
 
+	private static void usageExit() {
+		System.out.println("USAGE: " +
+				"\n   java main.Main --client host port"
+				+"\n   java main.Main --server port nbplayers"
+				+"\n   java main.Main --dedicated port nbplayers");
+		System.exit(0);
+	}
 
 	public SoundEngine getSoundEngine() {
 		return soundEngine;

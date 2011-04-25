@@ -16,13 +16,8 @@ package guiEngineLaunch;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MediaTracker;
-import java.awt.Point;
-import java.awt.Rectangle;
 
 /** 
  * @author ak

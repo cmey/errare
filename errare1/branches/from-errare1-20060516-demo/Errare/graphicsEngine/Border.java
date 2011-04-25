@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Border extends GraphicalRep{
 
@@ -32,7 +34,7 @@ public class Border extends GraphicalRep{
 	
 
 	@Override
-	public void draw(GLDrawable gld,float px, float py, float pz, float rx, float ry, float rz) {
+	public void draw(GLAutoDrawable gld,float px, float py, float pz, float rx, float ry, float rz) {
 		
 		
 	}
@@ -41,7 +43,7 @@ public class Border extends GraphicalRep{
 	
 	
 	
-	public void LeftBorderAction(GL gl) {
+	public void LeftBorderAction(GL2 gl) {
 		gl.glPushMatrix();
 		gl.glDepthMask(false);
 		if(prem) {
@@ -57,7 +59,7 @@ public class Border extends GraphicalRep{
 		gl.glLoadIdentity();
 		gl.glTranslated(-2,0,-1);
 		bdt=(float) Math.abs(Math.cos(bdti+=0.005));
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(0,bdt);gl.glVertex3d (-1,-1,-1); 
 		gl.glTexCoord2f(bdt,bdt);gl.glVertex3d (1,-1,-1); 
 		gl.glTexCoord2f(bdt,0);gl.glVertex3d (1,1,-1); 
@@ -72,7 +74,7 @@ public class Border extends GraphicalRep{
 		gl.glPopMatrix();
 	}
 	
-	public void RightBorderAction(GL gl) {
+	public void RightBorderAction(GL2 gl) {
 		gl.glPushMatrix();
 		gl.glDepthMask(false);
 		if(prem) {
@@ -89,7 +91,7 @@ public class Border extends GraphicalRep{
 		gl.glLoadIdentity();
 		gl.glTranslated(2,0,-1);
 		bdt=(float) Math.abs(Math.cos(bdti+=0.005));
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(0,bdt);gl.glVertex3d (-1,-1,-1); 
 		gl.glTexCoord2f(bdt,bdt);gl.glVertex3d (1,-1,-1); 
 		gl.glTexCoord2f(bdt,0);gl.glVertex3d (1,1,-1); 

@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Floor extends GraphicalRep{
 	private int FLOOR_SIZE = 1000;
@@ -28,7 +30,7 @@ public class Floor extends GraphicalRep{
 	
 	
 	
-	public void drawSol(GL gl, int px, int py, int pz, int rx, int ry, int rz) {
+	public void drawSol(GL2 gl, int px, int py, int pz, int rx, int ry, int rz) {
 		gl.glPushMatrix();
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		doPosition(gl,px,py,pz,rx,ry,rz);
@@ -40,10 +42,10 @@ public class Floor extends GraphicalRep{
 			//compiler sol
 			if(!gl.glIsTexture(list_terrain))
 			list_terrain = gl.glGenLists(1);
-			gl.glNewList(list_terrain, GL.GL_COMPILE);
+			gl.glNewList(list_terrain, GL2.GL_COMPILE);
 			//gl.glDisable(GL.GL_TEXTURE_2D);
 			//gl.glColor3f(0,1,0);
-			gl.glBegin(GL.GL_QUADS);
+			gl.glBegin(GL2.GL_QUADS);
 			gl.glTexCoord2i(0,0);
 			gl.glVertex3f(0,0,0);
 			gl.glTexCoord2i(0,1);
@@ -70,7 +72,7 @@ public class Floor extends GraphicalRep{
 
 
 	@Override
-	protected void draw(GLDrawable gld,float px, float py, float pz, float rx, float ry, float rz) {
+	protected void draw(GLAutoDrawable gld,float px, float py, float pz, float rx, float ry, float rz) {
 		// TODO Auto-generated method stub
 		
 	}

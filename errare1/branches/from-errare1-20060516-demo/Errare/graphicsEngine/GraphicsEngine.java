@@ -13,8 +13,6 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import guiEngine.GuiEngine;
-
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -26,37 +24,43 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUquadric;
 import javax.swing.JFrame;
 
 import main.CharacterRep;
 import main.HeroRep;
 import main.Main;
 import main.Rep;
-import net.java.games.jogl.DebugGL;
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
-import net.java.games.jogl.GLUquadric;
 import physicsEngine.Cube;
 import physicsEngine.CubeTree;
-import physicsEngine.PhysicalRep;
 import physicsEngine.Point3D;
 
 public class GraphicsEngine implements Runnable, GLEventListener {
 	
-	public static boolean DEBUG = false;
+	static {
+        // setting this true causes window events not to get sent on Linux if you run from inside Eclipse
+        GLProfile.initSingleton( false );
+    }
+	
+	public static boolean DEBUG = true;
 	int debug_displacement;
 	
 	private float shadow_nearZ = 100;
@@ -170,12 +174,13 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		mouseHelper = new MouseHelper(this);
 		keyboardHelper = new KeyboardHelper(mouseHelper);
 		
-		GLCapabilities capabilities=new GLCapabilities();
+		GLProfile glprofile = GLProfile.getDefault();
+		GLCapabilities capabilities=new GLCapabilities(glprofile);
 		capabilities.setHardwareAccelerated(true);
 		capabilities.setDoubleBuffered(true);
 		capabilities.setStencilBits(3);
 		
-		glc = GLDrawableFactory.getFactory().createGLCanvas(capabilities);
+		glc = new GLCanvas(capabilities);
 		glc.addGLEventListener(this);
 		
 		
@@ -207,16 +212,16 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	float[] LightPosition = { 0.0f, 100.0f, 0.0f, 1.0f };
 	public int[] maxTexelUnits;
 	
-	public void init(GLDrawable glDrawable) {
-		GL gl = glDrawable.getGL();
-		GLU glu = glDrawable.getGLU();
+	public void init(GLAutoDrawable glDrawable) {
+		GL2 gl = glDrawable.getGL().getGL2();
+		GLU glu = new GLU();
 		
 		Extensions.readEXT(gl);
 		if(DEBUG) Extensions.print_info();
 		//Extensions.write_info();
 		
 		maxTexelUnits = new int[1];
-		gl.glGetIntegerv(GL.GL_MAX_TEXTURE_UNITS_ARB,maxTexelUnits);
+		gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_UNITS,maxTexelUnits, 0);
 		if(maxTexelUnits[0]<2 || !Extensions.isSupported("GL_ARB_multitexture")
 				|| !Extensions.isSupported("GL_EXT_texture_env_combine")){
 			System.out.println("MULTITEXTURE NOT SUPPORTED !");
@@ -228,73 +233,73 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		//Extensions.assertPresence("GL_EXT_texture_env_combine");
 		
 		/** pour avoir les messages d'erreur d'opengl */
-		glDrawable.setGL(new DebugGL(glDrawable.getGL()));
+		//glDrawable.setGL(new DebugGL(glDrawable.getGL()));
 		//glDrawable.setGL(new TraceGL(glDrawable.getGL(), System.err));
 		
-		gl.glShadeModel(GL.GL_SMOOTH);
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDepthFunc(GL.GL_LEQUAL);						// The Type Of Depth Testing To Do
-		gl.glEnable(GL.GL_TEXTURE_2D);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		//gl.glEnable(GL.GL_AUTO_NORMAL);
-		//gl.glEnable(GL.GL_NORMALIZE);
-		gl.glAlphaFunc(GL.GL_GREATER,0.1f);
-		gl.glEnable(GL.GL_ALPHA_TEST);
+		gl.glShadeModel(GL2.GL_SMOOTH);
+		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl.glDepthFunc(GL2.GL_LEQUAL);						// The Type Of Depth Testing To Do
+		gl.glEnable(GL2.GL_TEXTURE_2D);
+		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+		//gl.glEnable(GL2.GL_AUTO_NORMAL);
+		//gl.glEnable(GL2.GL_NORMALIZE);
+		gl.glAlphaFunc(GL2.GL_GREATER,0.1f);
+		gl.glEnable(GL2.GL_ALPHA_TEST);
 		gl.glClearDepth(1.0f);								// Depth Buffer Setup
 		gl.glClearStencil(0);								// Clear The Stencil Buffer To 0
-		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);	// Really Nice Perspective Calculations
+		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);	// Really Nice Perspective Calculations
 		gl.glLineWidth(4);
 		
-		gl.glFrontFace(GL.GL_CCW);
-		//gl.glCullFace(GL.GL_FRONT);
-		//gl.glEnable(GL.GL_CULL_FACE);	
+		gl.glFrontFace(GL2.GL_CCW);
+		//gl.glCullFace(GL2.GL_FRONT);
+		//gl.glEnable(GL2.GL_CULL_FACE);	
 		
 		gl.glClearColor(0.5f,0.5f,0.5f,1.0f);				// We'll Clear To The Color Of The Fog ( Modified )
 		
-		gl.glFogi(GL.GL_FOG_MODE, GL.GL_LINEAR);			// Fog Mode
+		gl.glFogi(GL2.GL_FOG_MODE, GL2.GL_LINEAR);			// Fog Mode
 		float [] fogcolor = {0.5f, 0.5f, 0.5f, 1.0f};
-		gl.glFogfv(GL.GL_FOG_COLOR, fogcolor);				// Set Fog Color
-		//  gl.glFogf(GL.GL_FOG_DENSITY, 0.001f);				// How Dense Will The Fog Be
-		gl.glHint(GL.GL_FOG_HINT, GL.GL_NICEST);			// Fog Hint Value
-		gl.glFogf(GL.GL_FOG_START, 70f/100f*view_distance);	// Fog Start Depth
-		gl.glFogf(GL.GL_FOG_END, view_distance);			// Fog End Depth
-		gl.glEnable(GL.GL_FOG);								// Enables GL_FOG
+		gl.glFogfv(GL2.GL_FOG_COLOR, fogcolor, 0);				// Set Fog Color
+		//  gl.glFogf(GL2.GL_FOG_DENSITY, 0.001f);				// How Dense Will The Fog Be
+		gl.glHint(GL2.GL_FOG_HINT, GL2.GL_NICEST);			// Fog Hint Value
+		gl.glFogf(GL2.GL_FOG_START, 70f/100f*view_distance);	// Fog Start Depth
+		gl.glFogf(GL2.GL_FOG_END, view_distance);			// Fog End Depth
+		gl.glEnable(GL2.GL_FOG);								// Enables GL_FOG
 		
 		
 		//Set up materials
-		gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
-		gl.glEnable(GL.GL_COLOR_MATERIAL);
+		gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
+		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 		float[] white = {1f,1f,1f,1f};
-		gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, white);
-		gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 32.0f);
+		gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, white, 0);
+		gl.glMaterialf(GL2.GL_FRONT, GL2.GL_SHININESS, 32.0f);
 		
 		
 		
 		//float[] LightSpecular = { 1.0f , 1.0f , 1.0f , 1.0f };
 		float[] black = {0f,0f,0f,0f};
 		
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, LightdimAmbient);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, LightdimDiffuse);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, black);
-		gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, LightbrightAmbient);
-		gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, LightbrightDiffuse);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, white);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, LightdimAmbient, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, LightdimDiffuse, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, black, 0);
+		gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_AMBIENT, LightbrightAmbient, 0);
+		gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_DIFFUSE, LightbrightDiffuse, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, white, 0);
 		
-		//gl.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, LightSpecular);
-		//gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, global_ambient);
+		//gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, LightSpecular);
+		//gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, global_ambient);
 		
-		//gl.glEnable(GL.GL_LIGHT1);
-		//gl.glEnable(GL.GL_LIGHTING);
+		//gl.glEnable(GL2.GL_LIGHT1);
+		//gl.glEnable(GL2.GL_LIGHTING);
 		
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
-		gl.glMatrixMode(GL.GL_TEXTURE);
+		gl.glMatrixMode(GL2.GL_TEXTURE);
 		gl.glLoadIdentity();
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		
-		//gl.glPolygonMode( GL.GL_BACK, GL.GL_LINE );			// Back Face Is Filled In
-		//gl.glPolygonMode( GL.GL_FRONT, GL.GL_LINE );			// Front Face Is Drawn With Lines
+		//gl.glPolygonMode( GL2.GL_BACK, GL2.GL_LINE );			// Back Face Is Filled In
+		//gl.glPolygonMode( GL2.GL_FRONT, GL2.GL_LINE );			// Front Face Is Drawn With Lines
 		if(!DEBUG)
 			//main.getGuiEngine().initGUI(glDrawable);
 		glc.addMouseListener(mouseHelper);
@@ -315,28 +320,28 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	}
 	
 	
-	public void display(GLDrawable gld) {
+	public void display(GLAutoDrawable gld) {
 		voxel_drawn=0;
-		GL gl=gld.getGL();
-		GLU glu=gld.getGLU();
+		GL2 gl=gld.getGL().getGL2();
+		GLU glu= new GLU();
 		
-		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL2.GL_DEPTH_TEST);
 		if(keyboardHelper.fog_on){
-			gl.glEnable(GL.GL_FOG);
+			gl.glEnable(GL2.GL_FOG);
 		}else{
-			gl.glDisable(GL.GL_FOG);
+			gl.glDisable(GL2.GL_FOG);
 		}
 		
 		if(keyboardHelper.far_view){
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			glu.gluPerspective(45, aspect, 1f, view_distance*10);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 		}else{
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			glu.gluPerspective(45, aspect, 1f, view_distance);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 		}
 		
 		
@@ -353,14 +358,14 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		
 		
 		if(keyboardHelper.wire_mode)
-			gl.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE );
+			gl.glPolygonMode( GL2.GL_FRONT_AND_BACK, GL2.GL_LINE );
 		else
-			gl.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL );
+			gl.glPolygonMode( GL2.GL_FRONT_AND_BACK, GL2.GL_FILL );
 		
 		
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT);
+		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_STENCIL_BUFFER_BIT);
 		gl.glLoadIdentity();
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 		gl.glColor4f(1,1,1,1);
 		
 		if(mainChar != null) {
@@ -386,7 +391,7 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 			heightmap_auto.draw(gld);
 			drawScene(gld,false,false);
 			glow.readWindow(gl);
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT);
+			gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_STENCIL_BUFFER_BIT);
 			gl.glViewport(0,0,window_width,window_height);
 		}
 		
@@ -410,8 +415,8 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 			drawScene(gld,false,true);
 			
 			if(mainChar!=null && keyboardHelper.display_tree){
-				gl.glDisable(GL.GL_TEXTURE_2D);
-				gl.glEnable(GL.GL_BLEND);
+				gl.glDisable(GL2.GL_TEXTURE_2D);
+				gl.glEnable(GL2.GL_BLEND);
 				gl.glPushMatrix();
 				gl.glColor4f(0,0,1,0.5f);
 				Point3D pmc = mainChar.getPhysics().getCube().getCenter();
@@ -428,10 +433,10 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 				gl.glPopMatrix();
 				
 				gl.glColor4f(1,1,1,1);
-				gl.glEnable(GL.GL_TEXTURE_2D);
+				gl.glEnable(GL2.GL_TEXTURE_2D);
 			}
 		}
-		gl.glDisable(GL.GL_FOG);
+		gl.glDisable(GL2.GL_FOG);
 		
 		sun.updateSun();		
 		//sun.draw(gld,0,0,0,0,0,0);
@@ -460,22 +465,22 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		}
 		
 		
-		//gl.glDisable(GL.GL_TEXTURE_2D);
+		//gl.glDisable(GL2.GL_TEXTURE_2D);
 		
 		gl.glPushMatrix();
 		gl.glColor4f(1,1,1,1);
 		gl.glTranslated(intersecX, intersecY, intersecZ);
 		//gl.glTranslatef(0,5,0); //je fais un cylinder de 5 de haut : je translate de 5
 		//gl.glRotated(90,1,0,0);
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 		cursor.draw(gld);
 		//glu.gluCylinder(quadric, rond_picking_size,rond_picking_size,5,10,1);
 		//rond_picking_size=(rond_picking_size+0.5f)%15f;
 		//gl.glColor3f(1,1,1);
 		gl.glPopMatrix();
 		
-		//gl.glEnable(GL.GL_BLEND);
-		gl.glEnable(GL.GL_TEXTURE_2D);
+		//gl.glEnable(GL2.GL_BLEND);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
 		gl.glLoadIdentity();
 		gl.glColor4f(1,1,1,1);
 		
@@ -494,7 +499,7 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 			gl.glDepthMask(true);
 		}
 		
-		gl.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL );
+		gl.glPolygonMode( GL2.GL_FRONT_AND_BACK, GL2.GL_FILL );
 		if(DEBUG)
 			text2d.glPrint(gl,50,20,"GraphicsEngine Demo");
 		text2d.glPrint(gl,400,20,"culling: "+keyboardHelper.culling_on);
@@ -508,12 +513,12 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		fpscount++;
 	}
 	
-	public void drawSceneTree(GLDrawable gld, boolean for_reflect){
+	public void drawSceneTree(GLAutoDrawable gld, boolean for_reflect){
 		GraphicalRep.quadtree_hack_loopnumber++;
 		recurs(gld,for_reflect,this.cubetree);
 	}
 	
-	public void recurs(GLDrawable gld, boolean for_reflect, CubeTree t){
+	public void recurs(GLAutoDrawable gld, boolean for_reflect, CubeTree t){
 		if(t.getNodeContentsCount()<t.getTreeContentsCount()){
 			for(CubeTree ct : t.getChilds()){
 				sx = ct.getCenter().x;
@@ -554,7 +559,7 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		}
 	}
 	
-	public void drawScene(GLDrawable gld, boolean for_reflect, boolean advance_anim){
+	public void drawScene(GLAutoDrawable gld, boolean for_reflect, boolean advance_anim){
 		if(advance_anim) {MD2.forward=true;} else {MD2.forward=false;}
 		if(!DEBUG){
 			drawSceneTree(gld,for_reflect);
@@ -597,28 +602,28 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	float[] cameraViewMatrixBuffer = new float[16];
 	float[] lightProjectionMatrixBuffer = new float[16];
 	float[] lightViewMatrixBuffer = new float[16];
-	public void shadow(GLDrawable gld){
-		GL gl = gld.getGL();
-		GLU glu = gld.getGLU();
+	public void shadow(GLAutoDrawable gld){
+		GL2 gl = gld.getGL().getGL2();
+		GLU glu = new GLU();
 		if(sun.has_just_changed){
 			//RENDER SCENE FROM LIGHT'S POINT OF VIEW
-			gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
-			//gl.glDisable(GL.GL_TEXTURE_2D);
+			gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
+			//gl.glDisable(GL2.GL_TEXTURE_2D);
 			gl.glColorMask(false,false,false,false);
 			gl.glViewport(0, 0, shadowmap.shadowMapSize, shadowmap.shadowMapSize);
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			glu.gluPerspective(45, 1f, shadow_nearZ, shadow_farZ);
-			gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, lightProjectionMatrixBuffer);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, lightProjectionMatrixBuffer, 0);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			glu.gluLookAt(sun.sunX, sun.sunY, sun.sunZ, mcx, mcy, mcz, 0,1,0);
-			gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, lightViewMatrixBuffer);
+			gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, lightViewMatrixBuffer, 0);
 			gl.glPolygonOffset(1.1f, 4.0f);
-			gl.glCullFace(GL.GL_FRONT);
-			gl.glEnable(GL.GL_CULL_FACE);
-			gl.glEnable(GL.GL_POLYGON_OFFSET_FILL);
+			gl.glCullFace(GL2.GL_FRONT);
+			gl.glEnable(GL2.GL_CULL_FACE);
+			gl.glEnable(GL2.GL_POLYGON_OFFSET_FILL);
 			drawScene(gld,false,false);
 			heightmap_auto.draw(gld);
 			gl.glPopAttrib();
@@ -626,39 +631,39 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 			
 			// CAPTURE DEPTH BUFFER FROM LIGHT'S POINT OF VIEW
 			shadowmap.readShadowMap(gl,glu);
-			gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+			gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 			gl.glViewport(0,0,window_width,window_height);
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glLoadIdentity();
 			glu.gluPerspective(45, aspect, 1f, view_distance);
-			gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, cameraProjectionMatrixBuffer);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX, cameraProjectionMatrixBuffer, 0);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			glu.gluLookAt(mcx+camX, camY, mcz+camZ, mcx+lookX, mcy+lookY, mcz+lookZ, 0,1,0);
-			gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, cameraViewMatrixBuffer);
+			gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, cameraViewMatrixBuffer, 0);
 		}
 		
 		// Draw ALL shadowed
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		LightPosition[0]=sun.sunX;
 		LightPosition[1]=sun.sunY;
 		LightPosition[2]=sun.sunZ;
 		LightPosition[3]=1f;
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, LightPosition);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, LightPosition, 0);
 		gl.glPopMatrix();
-		gl.glEnable(GL.GL_LIGHT0);	//LIGHT0 is set up to be dark
-		gl.glEnable(GL.GL_LIGHTING);
+		gl.glEnable(GL2.GL_LIGHT0);	//LIGHT0 is set up to be dark
+		gl.glEnable(GL2.GL_LIGHTING);
 		drawScene(gld,false,false);
 		heightmap_auto.draw(gld);
 		gl.glPopAttrib();
 		
 		
 		// Draw Unshadowed parts
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
-		gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, LightPosition);
-		gl.glEnable(GL.GL_LIGHT1); //LIGHT1 is set up to be bright
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
+		gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, LightPosition, 0);
+		gl.glEnable(GL2.GL_LIGHT1); //LIGHT1 is set up to be bright
 		
 		float[] biasMatrixBuffer2D =   {0.5f, 0.0f, 0.0f, 0.0f,
 				0.0f, 0.5f, 0.0f, 0.0f,
@@ -674,27 +679,27 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		
 		//Set up texture units
 		//Unit 0
-		gl.glActiveTextureARB(GL.GL_TEXTURE1_ARB);
-		gl.glEnable(GL.GL_TEXTURE_2D);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, shadowmap.internal_texture1[0]);
+		gl.glActiveTexture(GL2.GL_TEXTURE1);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
+		gl.glBindTexture(GL2.GL_TEXTURE_2D, shadowmap.internal_texture1[0]);
 		
 		//Set up tex coord generation - s, t, q coords required
 		Matrix textureProjectionMatrix2D = new Matrix(4,4);
 		textureProjectionMatrix2D = biasMatrix2D.times(lightProjectionMatrix.times(lightViewMatrix));
-		gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-		gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(0));
-		gl.glEnable(GL.GL_TEXTURE_GEN_S);
-		gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-		gl.glTexGenfv(GL.GL_T, GL.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(1));
-		gl.glEnable(GL.GL_TEXTURE_GEN_T);
-		gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-		gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(3));
-		gl.glEnable(GL.GL_TEXTURE_GEN_Q);
+		gl.glTexGeni(GL2.GL_S, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_EYE_LINEAR);
+		gl.glTexGenfv(GL2.GL_S, GL2.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(0), 0);
+		gl.glEnable(GL2.GL_TEXTURE_GEN_S);
+		gl.glTexGeni(GL2.GL_T, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_EYE_LINEAR);
+		gl.glTexGenfv(GL2.GL_T, GL2.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(1), 0);
+		gl.glEnable(GL2.GL_TEXTURE_GEN_T);
+		gl.glTexGeni(GL2.GL_Q, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_EYE_LINEAR);
+		gl.glTexGenfv(GL2.GL_Q, GL2.GL_EYE_PLANE, textureProjectionMatrix2D.GetRow(3), 0);
+		gl.glEnable(GL2.GL_TEXTURE_GEN_Q);
 		
 		//Unit 1
-		gl.glActiveTextureARB(GL.GL_TEXTURE2_ARB);
-		gl.glEnable(GL.GL_TEXTURE_1D);
-		gl.glBindTexture(GL.GL_TEXTURE_1D, shadowmap.internal_texture2[0]);
+		gl.glActiveTexture(GL2.GL_TEXTURE2);
+		gl.glEnable(GL2.GL_TEXTURE_1D);
+		gl.glBindTexture(GL2.GL_TEXTURE_1D, shadowmap.internal_texture2[0]);
 		//Set up tex coord generation - s, q coords required
 		float[] biasMatrixBuffer1D =   {0.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 0.0f, 0.0f, 0.0f,
@@ -705,102 +710,102 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		
 		Matrix textureProjectionMatrix1D = new Matrix(4,4);
 		textureProjectionMatrix1D = biasMatrix1D.times(lightProjectionMatrix.times(lightViewMatrix));
-		gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-		gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, textureProjectionMatrix1D.GetRow(0));
-		gl.glEnable(GL.GL_TEXTURE_GEN_S);
-		gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-		gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, textureProjectionMatrix1D.GetRow(3));
-		gl.glEnable(GL.GL_TEXTURE_GEN_Q);
+		gl.glTexGeni(GL2.GL_S, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_EYE_LINEAR);
+		gl.glTexGenfv(GL2.GL_S, GL2.GL_EYE_PLANE, textureProjectionMatrix1D.GetRow(0), 0);
+		gl.glEnable(GL2.GL_TEXTURE_GEN_S);
+		gl.glTexGeni(GL2.GL_Q, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_EYE_LINEAR);
+		gl.glTexGenfv(GL2.GL_Q, GL2.GL_EYE_PLANE, textureProjectionMatrix1D.GetRow(3), 0);
+		gl.glEnable(GL2.GL_TEXTURE_GEN_Q);
 		
 		
 		//Set up texture combining
 		//unit 0
 		//alpha=texture alpha
-		gl.glActiveTextureARB(GL.GL_TEXTURE1_ARB);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_COMBINE_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_SOURCE0_ALPHA_EXT, GL.GL_TEXTURE);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_OPERAND0_ALPHA_EXT, GL.GL_SRC_ALPHA);
+		gl.glActiveTexture(GL2.GL_TEXTURE1);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_COMBINE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_SOURCE0_ALPHA, GL2.GL_TEXTURE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_OPERAND0_ALPHA, GL2.GL_SRC_ALPHA);
 		
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA_EXT, GL.GL_REPLACE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_REPLACE);
 		//color=primary color
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_SOURCE0_RGB_EXT, GL.GL_PRIMARY_COLOR_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_OPERAND0_RGB_EXT, GL.GL_SRC_COLOR);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_SOURCE0_RGB, GL2.GL_PRIMARY_COLOR);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_OPERAND0_RGB, GL2.GL_SRC_COLOR);
 		
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB_EXT, GL.GL_REPLACE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_REPLACE);
 		
 		//unit 1
 		//alpha =previous (add signed) (1-texture)
-		gl.glActiveTextureARB(GL.GL_TEXTURE2_ARB);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_COMBINE_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_SOURCE0_ALPHA_EXT, GL.GL_PREVIOUS_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_OPERAND0_ALPHA_EXT, GL.GL_SRC_ALPHA);
+		gl.glActiveTexture(GL2.GL_TEXTURE2);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_COMBINE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_SOURCE0_ALPHA, GL2.GL_PREVIOUS);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_OPERAND0_ALPHA, GL2.GL_SRC_ALPHA);
 		
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_ALPHA_EXT, GL.GL_ADD_SIGNED_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_SOURCE1_ALPHA_EXT, GL.GL_TEXTURE);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_OPERAND1_ALPHA_EXT, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_ALPHA, GL2.GL_ADD_SIGNED);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_SOURCE1_ALPHA, GL2.GL_TEXTURE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_OPERAND1_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		//color=primary color
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_SOURCE0_RGB_EXT, GL.GL_PREVIOUS_EXT);
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_OPERAND0_RGB_EXT, GL.GL_SRC_COLOR);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_SOURCE0_RGB, GL2.GL_PREVIOUS);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_OPERAND0_RGB, GL2.GL_SRC_COLOR);
 		
-		gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_COMBINE_RGB_EXT, GL.GL_REPLACE);
+		gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_COMBINE_RGB, GL2.GL_REPLACE);
 		
-		gl.glActiveTextureARB(GL.GL_TEXTURE0_ARB);
+		gl.glActiveTexture(GL2.GL_TEXTURE0);
 		
 		//Use alpha test to reject shadowed fragments
-		gl.glAlphaFunc(GL.GL_GEQUAL, 0.5f);
-		gl.glEnable(GL.GL_ALPHA_TEST);
+		gl.glAlphaFunc(GL2.GL_GEQUAL, 0.5f);
+		gl.glEnable(GL2.GL_ALPHA_TEST);
 		
 		drawScene(gld,false,false);
 		heightmap_auto.draw(gld);
 		gl.glPopAttrib();
-		gl.glDisable(GL.GL_ALPHA_TEST);
+		gl.glDisable(GL2.GL_ALPHA_TEST);
 	}
 	
 	
 	
-	public void reflection(GLDrawable gld){
-		GL gl = gld.getGL();
+	public void reflection(GLAutoDrawable gld){
+		GL2 gl = gld.getGL().getGL2();
 		/****************************** REFLECTION **************************************************/			
 		
 		// We Supose That All Frame Buffers Are Cleared
 		gl.glColorMask(false,false,false,false); // No Draw
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glEnable(GL.GL_STENCIL_TEST);
-		gl.glStencilFunc(GL.GL_ALWAYS, 3, 0xffffffff);// Always Passes, 1 Bit Plane, 1 As Mask
+		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl.glEnable(GL2.GL_STENCIL_TEST);
+		gl.glStencilFunc(GL2.GL_ALWAYS, 3, 0xffffffff);// Always Passes, 1 Bit Plane, 1 As Mask
 		
-		gl.glStencilOp(GL.GL_ZERO,GL.GL_KEEP, GL.GL_REPLACE);
+		gl.glStencilOp(GL2.GL_ZERO,GL2.GL_KEEP, GL2.GL_REPLACE);
 		// Set Stencil To 1 Where ReflectING Region Is
 		heightmap_auto.water.draw(gld,0,0,0,0,0,0);
 		
 		//(Intersection) Set Stencil To 0,
 		// Where Reflecting Region Is Masked By Some Objects
-		gl.glStencilOp(GL.GL_ZERO, GL.GL_KEEP, GL.GL_ZERO);
+		gl.glStencilOp(GL2.GL_ZERO, GL2.GL_KEEP, GL2.GL_ZERO);
 		// Zero If Test Fails (Here It Always Passes),
 		// Keep If Test Passes But Depth-Test Fails, Zero If Test Passes
 		heightmap_auto.draw_terrain(gl);
 		
 		
 		// Draw ReflectED Objects
-		gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 		gl.glColorMask(true,true,true,true);
-		gl.glStencilFunc(GL.GL_LEQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
-		gl.glStencilOp(GL.GL_KEEP, GL.GL_KEEP, GL.GL_REPLACE);	// Don't Change
+		gl.glStencilFunc(GL2.GL_LEQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
+		gl.glStencilOp(GL2.GL_KEEP, GL2.GL_KEEP, GL2.GL_REPLACE);	// Don't Change
 		
 		gl.glPushMatrix();
 		gl.glScalef(1.0f, -1.0f, 1.0f);			// Mirror Y Axis
 		
-		gl.glEnable(GL.GL_CLIP_PLANE0);		// Enable Clip Plane For Removing Artifacts (When The Object Crosses The Floor)
+		gl.glEnable(GL2.GL_CLIP_PLANE0);		// Enable Clip Plane For Removing Artifacts (When The Object Crosses The Floor)
 		double eqr[] = {0.0f,1.0f, 0.0f, 0.0f};
-		gl.glClipPlane(GL.GL_CLIP_PLANE0, eqr);	// Equation For Reflected Objects
+		gl.glClipPlane(GL2.GL_CLIP_PLANE0, eqr, 0);	// Equation For Reflected Objects
 		drawScene(gld,true,false);
 		heightmap_auto.draw_terrain(gl);
 		sun.draw(gld,0,0,0,0,0,0);
 		gl.glPopMatrix();
-		gl.glDisable(GL.GL_CLIP_PLANE0);
+		gl.glDisable(GL2.GL_CLIP_PLANE0);
 		
-		gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-		gl.glStencilFunc(GL.GL_EQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
-		gl.glStencilOp(GL.GL_KEEP, GL.GL_KEEP, GL.GL_KEEP);	// Don't Change
+		gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glStencilFunc(GL2.GL_EQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
+		gl.glStencilOp(GL2.GL_KEEP, GL2.GL_KEEP, GL2.GL_KEEP);	// Don't Change
 		
 		// THE REFLECTING REGION GETS BLENDED
 		heightmap_auto.water.draw(gld,0,0,0,0,0,0);
@@ -808,12 +813,12 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		
 		// DISPLAY THE REST BUT DONT TOUCH THE REFLECT :)
 		//gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl.glStencilFunc(GL.GL_NOTEQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
-		gl.glStencilOp(GL.GL_KEEP, GL.GL_KEEP, GL.GL_KEEP);	// Don't Change
+		gl.glStencilFunc(GL2.GL_NOTEQUAL, 2, 0xffffffff);// We Draw Only Where The Stencil Is 1
+		gl.glStencilOp(GL2.GL_KEEP, GL2.GL_KEEP, GL2.GL_KEEP);	// Don't Change
 		heightmap_auto.draw_terrain(gl);
 		terrain_found = true;
 		heightmap_auto.water.draw(gld,0,0,0,0,0,0);
-		gl.glDisable(GL.GL_STENCIL_TEST);
+		gl.glDisable(GL2.GL_STENCIL_TEST);
 		
 		
 		/********************************************************************************************/			
@@ -836,34 +841,32 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	}
 	
 	
-	private void gestionPicking(MouseEvent e, GL gl, GLU glu) {
+	private void gestionPicking(MouseEvent e, GL2 gl, GLU glu) {
 		glu.gluLookAt(mcx+camX, mcy+camY, mcz+camZ, mcx+lookX, mcy+lookY, mcz+lookZ, 0,1,0);
 		double[] modelview = new double[16];
 		double[] projection = new double[16];
 		int[] viewport = new int[4];
 		
-		gl.glGetDoublev(GL.GL_MODELVIEW_MATRIX, modelview);
-		gl.glGetDoublev(GL.GL_PROJECTION_MATRIX, projection);
-		gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
+		gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, modelview, 0);
+		gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection, 0);
+		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
 		
 		
-		double winX; winX=xMouse;
-		double winY; winY=yMouse;
+		double winX = xMouse;
+		double winY = yMouse;
 		winY = (double)viewport[3] - (double)winY;
-		float[] winZ = new float[1];
-		gl.glReadPixels ((int)winX, (int)winY, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT, winZ);
+		FloatBuffer winZ = FloatBuffer.allocate(1);
+		gl.glReadPixels ((int)winX, (int)winY, 1, 1, GL2.GL_DEPTH_COMPONENT, GL2.GL_FLOAT, winZ);
 		//winZ[0]=100;
-		double[] objX = new double[1];
-		double[] objY = new double[1];
-		double[] objZ = new double[1];
+		double[] obj = new double[3];
 		//System.out.print("mouse pos: "+winX +" "+winY+" "+winZ[0]);    	  
 		
 		glu.gluUnProject(
-				winX, winY, winZ[0],
-				modelview,
-				projection,
-				viewport,
-				objX, objY, objZ
+				winX, winY, winZ.get(0),
+				modelview, 0,
+				projection, 0,
+				viewport, 0,
+				obj, 0
 		);
 		
 		//if(DEBUG) System.out.print("   3Dclik: "+(int)objX[0] + " " + (int)objY[0] + " " + (int)objZ[0]);
@@ -871,9 +874,9 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		//intersecX=(mcx+camX)+(camY/(camY-objY[0]))*(objX[0]-(mcx+camX));
 		//intersecZ=(mcz+camZ)+(camY/(camY-objY[0]))*(objZ[0]-(mcz+camZ));
 		
-		intersecX = objX[0];
-		intersecY = objY[0];
-		intersecZ = objZ[0];
+		intersecX = obj[0];
+		intersecY = obj[1];
+		intersecZ = obj[2];
 		
 		if(DEBUG) System.out.println("   intersecX: "+(int)intersecX+" intersecZ: "+(int)intersecZ);
 		
@@ -897,16 +900,16 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	 int[] viewport = new int[4];
 	 
 	 gl.glSelectBuffer(64, selectBuff);
-	 gl.glGetIntegerv(GL.GL_VIEWPORT, viewport);
-	 gl.glMatrixMode(GL.GL_PROJECTION);
+	 gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
+	 gl.glMatrixMode(GL2.GL_PROJECTION);
 	 gl.glPushMatrix();
 	 
-	 gl.glRenderMode(GL.GL_SELECT);
+	 gl.glRenderMode(GL2.GL_SELECT);
 	 gl.glLoadIdentity();
 	 glu.gluPickMatrix(x, viewport[3] - y, 5, 5, viewport);
 	 glu.gluPerspective(30.0f, fAspect, 1.0, 50);
 	 draw(drawable);
-	 hits = gl.glRenderMode(GL.GL_RENDER);
+	 hits = gl.glRenderMode(GL2.GL_RENDER);
 	 if (hits > 0) {
 	 int count = selectBuff[0];
 	 pickedName = selectBuff[3];
@@ -917,28 +920,28 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	 pickedName = 0;
 	 }
 	 
-	 gl.glMatrixMode(GL.GL_PROJECTION);
+	 gl.glMatrixMode(GL2.GL_PROJECTION);
 	 gl.glPopMatrix();
-	 gl.glMatrixMode(GL.GL_MODELVIEW);
+	 gl.glMatrixMode(GL2.GL_MODELVIEW);
 	 picked = false;
 	 
 	 } */
 	
 	
-	public void reshape(GLDrawable glDrawable, int x, int y, int w, int h) 
+	public void reshape(GLAutoDrawable glDrawable, int x, int y, int w, int h) 
 	{
 		window_width=w;
 		window_height=h;
-		GL gl = glDrawable.getGL();
+		GL2 gl = glDrawable.getGL().getGL2();
 		gl.glViewport(x, y, window_width, window_height);
 		
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
 		
 		aspect = (float)((float) window_width / (float) window_height);
-		glDrawable.getGLU().gluPerspective(45, aspect, 1f, view_distance);
+		new GLU().gluPerspective(45, aspect, 1f, view_distance);
 		
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity(); 
 		
 		mouseHelper.setGLGLU(gl);
@@ -1155,6 +1158,12 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	}
 	public void setHeightMap(float[][] map, int map_size){
 		heightmap_auto.setHeightMap_fromPhysical(map, map_size);
+	}
+
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

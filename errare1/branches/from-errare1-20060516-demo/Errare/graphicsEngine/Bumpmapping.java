@@ -13,7 +13,6 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
 
 public interface Bumpmapping {
 

@@ -13,27 +13,18 @@ GNU General Public License for more details.*/
 
 package main;
 
-import gameEngine.Characters;
 import gameEngine.GameEngine;
 import gameEngine.Hero;
-import gameEngine.ItemCharacteristics;
 import gameEngine.Monster;
 import graphicsEngine.GraphicalRep;
 import graphicsEngine.GraphicsEngine;
 import graphicsEngine.MD2;
-import guiEngine.GuiRep;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Set;
 
 import networkEngine.NetworkClient;
-
 import physicsEngine.CharacterPRep;
-import physicsEngine.ItemPRep;
 import physicsEngine.PhysicsEngine;
 import physicsEngine.SettingPRep;
 
@@ -69,8 +60,13 @@ public class Generator {
 		placeVegetation((int) (mapsize*mapsize*0.0002), "data/objects/plant4.md2");
 		placeVegetation((int) (mapsize*mapsize*0.0001), "data/objects/plant5.md2");
 
-		generateMainChars(networkClient.getNbplayers(), networkClient.getId());
-		generateSpawnPoints(networkClient.getNbai());
+		if(networkClient == null) { // standalone
+			generateMainChars(1, 0);
+			generateSpawnPoints(10);
+		} else {
+			generateMainChars(networkClient.getNbplayers(), networkClient.getId());
+			generateSpawnPoints(networkClient.getNbai());
+		}
 		
 	}
 
@@ -124,7 +120,8 @@ public class Generator {
 			};
 		}
 		
-		networkClient.setMainChars(set);
+		if(networkClient != null)
+			networkClient.setMainChars(set);
 	}
 	
 	private void generateSpawnPoints(int n) {

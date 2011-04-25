@@ -41,9 +41,9 @@ public class Client extends Thread{
 	
 	public void run(){
 		try {
-			System.out.println("Getting the oos");
+			System.out.println("Client: Getting the oos");
 			oos=new ObjectOutputStream(s.getOutputStream());
-			System.out.println("Getting the ois");
+			System.out.println("Client: Getting the ois");
 			ois=new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
 			server.add(this);
 			oos.writeInt(server.getSeed());
@@ -53,7 +53,7 @@ public class Client extends Thread{
 			oos.flush();
 			ois.readBoolean();
 			server.clientReady();
-			System.out.println("Ready to get Objects");
+			System.out.println("Client: Ready to get Objects");
 			NetworkMove nm;
 			while(true){
 				nm=(NetworkMove)ois.readObject();

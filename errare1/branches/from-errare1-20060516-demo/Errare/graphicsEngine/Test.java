@@ -14,9 +14,8 @@ GNU General Public License for more details.*/
 package graphicsEngine;
 
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.util.LinkedList;
+
 import javax.swing.JFrame;
 
 public class Test implements Runnable{
@@ -26,7 +25,12 @@ public class Test implements Runnable{
 	public static void main (String[] args) {
 		
 		JFrame window = new JFrame("Graphics Engine");
+		
 		ge = new GraphicsEngine(window);
+		
+//		float[][] terrain = new float[500][500];
+//		ge.setHeightMap(terrain, 500);
+		
 		window.setUndecorated(true);
 		window.setSize(new Dimension(800,600));
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,7 +88,6 @@ public class Test implements Runnable{
 		
 		ge.debugsetDisplayList(glist);
 		ge.debugsetDisplayList(glist);
-		
 		
 		window.add(ge.getGLCanvas());
 		

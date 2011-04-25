@@ -13,12 +13,11 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import java.awt.Point;
-import java.awt.geom.Point2D;
-
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLU;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.glu.GLU;
 
 public class LensFlare{
 
@@ -48,8 +47,8 @@ public class LensFlare{
 		oposite = new Point3D();
 	}
 	
-	public void draw(GL gl, GLU glu, Frustum fru){
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+	public void draw(GL2 gl, GLU glu, Frustum fru){
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);
 		gl.glDisable(GL.GL_DEPTH_TEST);
@@ -197,22 +196,22 @@ public class LensFlare{
 			
 		}
 		
-		public void draw (GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
+		public void draw (GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz){
 			
 		}
 		
-		public void render(GL gl,float r, float g, float b, float a, Point3D p, float scale){
+		public void render(GL2 gl,float r, float g, float b, float a, Point3D p, float scale){
 			
 			if(prem) {
 				doExpandTexture(gl);
 				prem=false;
 			}
 
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			gl.glOrtho(0,GraphicsEngine.window_width,0,GraphicsEngine.window_height,-1,1);
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
 			
@@ -234,9 +233,9 @@ public class LensFlare{
 			gl.glEnd();										
 			
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_PROJECTION);
+			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			
 		}
 	}

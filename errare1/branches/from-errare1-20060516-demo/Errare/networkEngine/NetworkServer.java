@@ -42,16 +42,16 @@ public class NetworkServer extends ServerSocket {
 		seed=(int)(Math.random()*1000);
 		clients=new ArrayList<Client>();
 		events=new ArrayList<NetworkMove>();
-		System.out.println("Server launched, waiting for clients");
+		System.out.println("Server: Server launched, waiting for clients");
 		waitForClients();
 	}
 	
-	private void waitForClients() throws IOException {
+	private synchronized void waitForClients() throws IOException {
 		int currentPlayers=0;
 		Socket temp;
 		while(currentPlayers<nbPlayers){
 			temp=accept();
-			System.out.println("Client connected: "+temp.getInetAddress());
+			System.out.println("Server: Client connected: "+temp.getInetAddress());
 			new Client(temp,this,currentPlayers);
 			currentPlayers++;
 		}
@@ -61,14 +61,21 @@ public class NetworkServer extends ServerSocket {
 	
 	
 	private void startGame() throws IOException {
-		while(nbReadyClient!=nbPlayers){}
-		System.out.println("Be ready clients!");
+		while(nbReadyClient!=nbPlayers){
+			try {
+				Thread.sleep(1000);
+				System.out.println("Server: Waiting for "+ (nbPlayers-nbReadyClient) +" more client(s)");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Server: Be ready clients!");
 		for(Client c : clients){
 			c.ready();
 		}
 	}
 	
-	private void sendAck() throws IOException{
+	private synchronized void sendAck() throws IOException{
 		synchronized(events){
 			for(Client c : clients){
 				new SendingThread(c).start();
@@ -80,7 +87,7 @@ public class NetworkServer extends ServerSocket {
 	
 	
 	
-	public void remove(Client client) {
+	public synchronized void remove(Client client) {
 		int index=0;
 		synchronized(clients){
 			for(Client c : clients){
@@ -97,14 +104,14 @@ public class NetworkServer extends ServerSocket {
 				index++;
 			}
 		}
-		System.out.println("Client disconnected");
+		System.out.println("Server: Client disconnected");
 	}
 	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public synchronized static void main(String[] args) throws IOException {
 		new NetworkServer(1099,2,3);
 	}
 	
@@ -124,7 +131,7 @@ public class NetworkServer extends ServerSocket {
 		nbReadyClient++;
 	}
 	
-	public void addEvent() throws IOException {
+	public synchronized void addEvent() throws IOException {
 			clientlist++;
 		if(clientlist==nbPlayers){
 			sendAck();
@@ -133,7 +140,7 @@ public class NetworkServer extends ServerSocket {
 
 	public void add(Client client) {
 		synchronized(clients){
-		clients.add(client);
+			clients.add(client);
 		}
 	}
 	
@@ -154,7 +161,7 @@ public class NetworkServer extends ServerSocket {
 		}
 	}
 
-	public void send(NetworkMove nm) throws IOException {
+	public synchronized void send(NetworkMove nm) throws IOException {
 		for(Client c : clients){
 			c.send(nm);
 		}

@@ -14,9 +14,6 @@ GNU General Public License for more details.*/
 package physicsEngine;
 
 
-import gameEngine.Characters;
-
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 

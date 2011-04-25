@@ -13,8 +13,12 @@ GNU General Public License for more details.*/
 
 package aiEngine;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Chromosome implements Serializable{
 	

@@ -33,15 +33,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-import net.java.games.jogl.Animator;
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
-import net.java.games.jogl.util.BufferUtils;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawable;
+import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.glu.GLU;
+
+import com.jogamp.opengl.util.Animator;
 
 
 class PickingExemple{
@@ -55,10 +58,10 @@ class PickingExemple{
 	PickingExemple()
 	{
 		Frame frame = new Frame("Picking Example");
-		GLDrawableFactory factory = GLDrawableFactory.getFactory();
-		GLCapabilities capabilities = new GLCapabilities();
-		GLCanvas drawable = factory.createGLCanvas(capabilities);
-		drawable.addGLEventListener(new Renderer());
+		GLProfile glprofile = GLProfile.getDefault();
+		GLCapabilities capabilities = new GLCapabilities(glprofile);
+		GLCanvas drawable = new GLCanvas(capabilities);
+		drawable.addGLEventListener(new Renderer(drawable));
  		frame.add(drawable);
 		frame.setSize(400, 400);
 		final Animator animator = new Animator(drawable);
@@ -80,39 +83,47 @@ class PickingExemple{
 		int cmd = UPDATE;
 		int mouse_x, mouse_y;
 	
-	    	private GL gl;
+	    	private GL2 gl;
 		private GLU glu;
  		private GLDrawable gldrawable;
+ 		
+ 		private GLCanvas canvas;
+ 		
+ 		public Renderer(GLCanvas canvas)
+ 		{
+ 			this.canvas = canvas;
+ 		}
 		
-		public void init(GLDrawable drawable) 
+		public void init(GLAutoDrawable drawable) 
 	    	{
-   			gl = drawable.getGL();
-			glu = drawable.getGLU();
+   			gl = drawable.getGL().getGL2();
+			glu = new GLU();
 	      		this.gldrawable = drawable;
    			gl.glEnable(GL.GL_CULL_FACE);
    			gl.glEnable(GL.GL_DEPTH_TEST);
-	      		gl.glEnable(GL.GL_NORMALIZE);
+	      		gl.glEnable(GL2.GL_NORMALIZE);
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	        	drawable.addMouseListener(this);
-   			drawable.addMouseMotionListener(this);
+	        	
+			canvas.addMouseListener(this);
+   			canvas.addMouseMotionListener(this);
 	    	}
  	
- 		public void reshape(GLDrawable drawable, int x, int y, int width, int height) 
+ 		public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) 
 	    	{
 			
 			float h = (float) height / (float) width;
 			gl.glViewport(0, 0, width, height);
-   			gl.glMatrixMode(GL.GL_PROJECTION);
+   			gl.glMatrixMode(GL2.GL_PROJECTION);
      		gl.glLoadIdentity();
 			glu.gluOrtho2D(0.0f,1.0f,0.0f,1.0f);
 	    	}
 
-	    	public void display(GLDrawable drawable) 
+	    	public void display(GLAutoDrawable drawable) 
  		{
 	    		IntBuffer selectBuffer;
 	    		final int bufferSize  = 10;
 	    		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(
-	    				BufferUtils.SIZEOF_INT*bufferSize);
+	    				4*bufferSize);
 	    		byteBuffer.order(ByteOrder.nativeOrder());
 	    		selectBuffer  = byteBuffer.asIntBuffer();
 			switch(cmd)
@@ -126,21 +137,23 @@ class PickingExemple{
 					int[] viewPort = new int[4];
 			    		;
 				    	int hits = 0;
-					gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort);
+					gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
+					selectBuffer.rewind();
 			      		gl.glSelectBuffer(buffsize, selectBuffer);
-	    				gl.glRenderMode(GL.GL_SELECT);
+	    				gl.glRenderMode(GL2.GL_SELECT);
 					gl.glInitNames();
-				    	gl.glMatrixMode(GL.GL_PROJECTION);
+				    	gl.glMatrixMode(GL2.GL_PROJECTION);
 			   		gl.glPushMatrix();
 		    			gl.glLoadIdentity();
-		    			glu.gluPickMatrix(x, (double) viewPort[3] - y, 5.0d, 5.0d, viewPort);
+		    			glu.gluPickMatrix(x, (double) viewPort[3] - y, 5.0d, 5.0d, viewPort, 0);
 			  		glu.gluOrtho2D(0.0d, 1.0d, 0.0d, 1.0d);
 					drawScene();
-					gl.glMatrixMode(GL.GL_PROJECTION);
+					gl.glMatrixMode(GL2.GL_PROJECTION);
 					gl.glPopMatrix();
 					gl.glFlush();
-				    	hits = gl.glRenderMode(GL.GL_RENDER);
+				    	hits = gl.glRenderMode(GL2.GL_RENDER);
 				    
+				    	selectBuffer.rewind();
 					processHits(hits, selectBuffer);
 					cmd = UPDATE;
 					break;
@@ -183,14 +196,14 @@ class PickingExemple{
 		public int viewPortWidth()
 		{
 			int[] viewPort = new int[4];
-			gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort);
+			gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
 			return viewPort[2];
 		}
 
 		public int viewPortHeight()
 		{
 			int[] viewPort = new int[4];
-			gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort);
+			gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort, 0);
 			return viewPort[3];
 		}
 
@@ -235,9 +248,7 @@ class PickingExemple{
 
 			gl.glFlush();
 		}
-
-		public void displayChanged(GLDrawable drawable, boolean modeChanged, boolean deviceChanged) {}
-				
+		
  		public void mousePressed(MouseEvent e) 
 		{
 			cmd = SELECT;
@@ -258,9 +269,9 @@ class PickingExemple{
 			float[] c;
 			int id = 0;
 			boolean outline = false;
-			GL gl;
+			GL2 gl;
 			GLU glu;
-			public GLEntity(GL gl, GLU glu)
+			public GLEntity(GL2 gl, GLU glu)
 			{
 				this.gl = gl;
 				this.glu = glu;
@@ -277,25 +288,31 @@ class PickingExemple{
 		{
 			float w = 0.1f;
 			float h = 0.1f;
-			public GLRectangleEntity(GL gl, GLU glu)
+			public GLRectangleEntity(GL2 gl, GLU glu)
 			{
 				super(gl, glu);
 			}
 			public void _draw()
 			{
 				if (outline)
-					gl.glPolygonMode(GL.GL_FRONT, GL.GL_LINE);
+					gl.glPolygonMode(GL.GL_FRONT, GL2.GL_LINE);
 				else
-					gl.glPolygonMode(GL.GL_FRONT, GL.GL_FILL);
+					gl.glPolygonMode(GL.GL_FRONT, GL2.GL_FILL);
 
-				gl.glColor4fv(c);
-				gl.glBegin(GL.GL_POLYGON);
+				gl.glColor4fv(c, 0);
+				gl.glBegin(GL2.GL_POLYGON);
 					gl.glVertex3f(x, y, z);
 					gl.glVertex3f(x + w, y, z);
 					gl.glVertex3f(x + w, y + h, z);
 					gl.glVertex3f(x, y + h, z);
 				gl.glEnd();
 			}			
+		}
+
+		@Override
+		public void dispose(GLAutoDrawable arg0) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 }

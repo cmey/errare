@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Water extends GraphicalRep{
 	
@@ -37,9 +39,9 @@ public class Water extends GraphicalRep{
 	}
 	
 	
-	public void draw(GLDrawable gld, float x, float y, float z, float rx, float ry, float rz){
-		GL gl = gld.getGL();
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+	public void draw(GLAutoDrawable gld, float x, float y, float z, float rx, float ry, float rz){
+		GL2 gl = gld.getGL().getGL2();
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		gl.glPushMatrix();
 		if(prem){
 			prem=false;
@@ -72,7 +74,7 @@ public class Water extends GraphicalRep{
 		*/
 	}
 	
-	private void drawVertex(GL gl, int i, int j){
+	private void drawVertex(GL2 gl, int i, int j){
 		gl.glTexCoord2f((float)i/(heightmap.inter.length-heightmap.step)*texrepet,
 						(float)j/(heightmap.inter[0].length-heightmap.step)*texrepet);
 		//gl.glNormal3f(inter_norm[i/step][j/step].X,inter_norm[i/step][j/step].Y,inter_norm[i/step][j/step].Z);
@@ -85,12 +87,12 @@ public class Water extends GraphicalRep{
 		
 	}
 	
-	private void compile_water(GL gl){
+	private void compile_water(GL2 gl){
 		if(!gl.glIsList(list_water)){
 			list_water = gl.glGenLists(1);
 		}
 
-		gl.glNewList(list_water, GL.GL_COMPILE);
+		gl.glNewList(list_water, GL2.GL_COMPILE);
 		
 		gl.glBegin(GL.GL_TRIANGLES);
 		for (int i=0;i<heightmap.inter.length-heightmap.step;i+=heightmap.step) {

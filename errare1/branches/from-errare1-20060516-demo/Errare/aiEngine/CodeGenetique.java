@@ -13,10 +13,11 @@ GNU General Public License for more details.*/
 
 package aiEngine;
 
-import java.io.*;
-import java.util.*;
-
-import aiEngine.Chromosome;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 //un bestiau = 1 chromosome
 public class CodeGenetique implements Serializable{
 	

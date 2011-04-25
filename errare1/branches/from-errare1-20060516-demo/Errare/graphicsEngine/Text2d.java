@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Text2d extends GraphicalRep{
 
@@ -24,10 +26,10 @@ public class Text2d extends GraphicalRep{
 		super(filename, GraphicalRep.FORMAT_TEXT);
 	}
 
-	public void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {}
+	public void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {}
 	
 	
-	public void BuildFont(GL gl){
+	public void BuildFont(GL2 gl){
 		//gl.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_ONE);
 		//gl.glEnable(GL.GL_BLEND);
 		
@@ -43,8 +45,8 @@ public class Text2d extends GraphicalRep{
 				cx=(float)(loop%16)/16.0f;// X Position Of Current Character
 				cy=(float)(loop/16)/16.0f;// Y Position Of Current Character
 				
-				gl.glNewList(list_chars+loop,GL.GL_COMPILE);
-				gl.glBegin(GL.GL_QUADS);
+				gl.glNewList(list_chars+loop,GL2.GL_COMPILE);
+				gl.glBegin(GL2.GL_QUADS);
 				
 				gl.glTexCoord2f(cx,1f-cy-0.0625f);// Texture Coord (Bottom Left)
 				gl.glVertex2i(0,0);			// Vertex Coord (Bottom Left)
@@ -65,14 +67,14 @@ public class Text2d extends GraphicalRep{
 	
 	
 	
-	public void glPrint(GL gl,int x, int y, String s){
+	public void glPrint(GL2 gl,int x, int y, String s){
 		gl.glBindTexture(GL.GL_TEXTURE_2D, internal_texture1[0]);
 		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
 		gl.glOrtho(0,GraphicsEngine.window_width,0,GraphicsEngine.window_height,-1,1);
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
 		gl.glColor4f(1,1,1,1);
@@ -84,9 +86,9 @@ public class Text2d extends GraphicalRep{
 				gl.glCallList(list_chars+array[i]-32);
 		gl.glDisable(GL.GL_BLEND);
 		gl.glPopMatrix();
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glPopMatrix();
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glEnable(GL.GL_DEPTH_TEST);
 	}
 

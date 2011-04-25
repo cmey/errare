@@ -13,8 +13,10 @@ GNU General Public License for more details.*/
 
 package graphicsEngine;
 
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLDrawable;
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLDrawable;
 
 public class Heightmap extends GraphicalRep{
 	
@@ -126,14 +128,18 @@ public class Heightmap extends GraphicalRep{
 	}
 	
 	
-	private void compile_terrain(GL gl){
-		nb_texrepet = MAP_SIZE / 512;
-		step_world = MAP_SIZE / nb_div;
-		step = inter.length / nb_div;
+	private void compile_terrain(GL2 gl){
+		assert(0 != MAP_SIZE);
+		nb_texrepet = MAP_SIZE / 512; assert(0 != nb_texrepet);
+		step_world = MAP_SIZE / nb_div; assert(0 != step_world);
+		assert(0 != inter.length);
+		step = inter.length / nb_div; assert(0 != step);
+		
 		compute_normals();
+		
 		if(!gl.glIsTexture(list_terrain))
 			list_terrain = gl.glGenLists(1);
-		gl.glNewList(list_terrain, GL.GL_COMPILE);
+		gl.glNewList(list_terrain, GL2.GL_COMPILE);
 		for (int i=0;i<inter.length-step;i+=step) {
 			gl.glBegin(GL.GL_TRIANGLE_STRIP);
 			for (int j=0;j<inter[0].length-step;j+=step) {
@@ -149,7 +155,7 @@ public class Heightmap extends GraphicalRep{
 	}
 	
 	
-	private void drawVertex(GL gl, int i, int j){
+	private void drawVertex(GL2 gl, int i, int j){
 		float alt = inter[i][j] / CoefElev + 0.7f;
 		gl.glColor4f(alt,alt,alt,alpha);
 		gl.glTexCoord2f((float)i/(inter.length-step)*nb_texrepet,(float)j/(inter[0].length-step)*nb_texrepet);
@@ -179,6 +185,9 @@ public class Heightmap extends GraphicalRep{
 		}
 	}
 	public void setHeightMap_fromPhysical(float[][] map, int world_step){
+		assert(0 != map.length);
+		assert(0 != world_step);
+		
 		if(map.length>128){
 			Error.println("Your heightmap is too big and is NOT taken into account! Replaced by standard heightmap.");
 			Error.println("Supported: max 128x128  yours: "+map.length+"x"+map.length);
@@ -187,7 +196,8 @@ public class Heightmap extends GraphicalRep{
 			//decalage = map_size/4;
 			
 			inter = map;
-			nb_div=map.length;
+			nb_div = map.length; assert(0 != nb_div);
+			
 			must_recompile=true;
 			//compute_normals();
 			water.setWater_fromPhysical(this,MAP_SIZE,decalage);
@@ -197,8 +207,8 @@ public class Heightmap extends GraphicalRep{
 	}
 
 
-	public void draw_terrain(GL gl){
-		gl.glPushAttrib(GL.GL_ALL_ATTRIB_BITS);
+	public void draw_terrain(GL2 gl){
+		gl.glPushAttrib(GL2.GL_ALL_ATTRIB_BITS);
 		//gl.glDisable(GL.GL_CULL_FACE);
 		
 		
@@ -231,8 +241,8 @@ public class Heightmap extends GraphicalRep{
 	
 	
 	@Override
-	protected void draw(GLDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
-		GL gl = gld.getGL();
+	protected void draw(GLAutoDrawable gld, float px, float py, float pz, float rx, float ry, float rz) {
+		GL2 gl = gld.getGL().getGL2();
 		draw_terrain(gl);
 	}
 

@@ -13,12 +13,9 @@ GNU General Public License for more details.*/
 
 package main;
 
-import physicsEngine.CharacterPRep;
-import physicsEngine.ItemPRep;
 import gameEngine.Characters;
-import gameEngine.ItemCharacteristics;
 import graphicsEngine.GraphicalRep;
-import guiEngine.GuiRep;
+import physicsEngine.CharacterPRep;
 
 /** 
  * Class which manage the characters

@@ -13,7 +13,6 @@ GNU General Public License for more details.*/
 
 package physicsEngine;
 
-import java.awt.geom.Point2D;
 
 public class Triangle {
 

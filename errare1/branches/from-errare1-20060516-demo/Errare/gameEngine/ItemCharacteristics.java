@@ -13,7 +13,7 @@ GNU General Public License for more details.*/
 
 package gameEngine;
 
-import main.*;
+import main.ItemRep;
 
 /*
  * Created on 15 sept. 2005

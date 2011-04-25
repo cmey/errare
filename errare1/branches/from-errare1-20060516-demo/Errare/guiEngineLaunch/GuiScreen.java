@@ -15,10 +15,8 @@ package guiEngineLaunch;
 
 import java.awt.DisplayMode;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Window;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
