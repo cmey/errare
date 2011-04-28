@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/jogg/jogg-0.0.7.jar"/>
 	<classpathentry kind="lib" path="libs/jorbis/jorbis-0.0.15.jar"/>
 	<classpathentry kind="lib" path="libs/tritonus/tritonus_share.jar"/>
 	<classpathentry kind="lib" path="libs/vorbisspi/vorbisspi1.0.2.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogl">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_24"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogl-linux64">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/cmey/perso/eclipseworkspace/errare-googlecode/errare1/branches/from-errare1-20060516-demo/Errare/libs/jogl/jogl-2.0-b23-20110303-windows-amd64/lib"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Errare/libs/jogl/jogl-2.0-b23-20110303-linux-amd64/lib"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path=""/>
