@@ -181,4 +181,35 @@ GraphicsEngine: animation in data/md2/insect/tris.md2 not found: run
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
  debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: run
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/awolf/tris.md2 not found: stand
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/jd/tris.md2 not found: attack
+ debug pour chris: startFound=false endFound=trueGraphicsEngine: animation in data/md2/jd/tris.md2 not found: attack
  debug pour chris: startFound=false endFound=true

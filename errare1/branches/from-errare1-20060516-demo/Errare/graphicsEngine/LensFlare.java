@@ -39,10 +39,10 @@ public class LensFlare{
 	Point3D vLightSourceToIntersect;
 	
 	public LensFlare(){
-		bigGlow = new OneFlare("medias/GraphicsEngine/Sky/big_glow.png");
-		streaks = new OneFlare("medias/GraphicsEngine/Sky/streaks.png");
-		smallGlow = new OneFlare("medias/GraphicsEngine/Sky/small_glow.png");
-		halo = new OneFlare("medias/GraphicsEngine/Sky/halo.png");
+		bigGlow = new OneFlare("data/images/sky/big_glow.jpg");
+		streaks = new OneFlare("data/images/sky/streaks.jpg");
+		smallGlow = new OneFlare("data/images/sky/glow.jpg");
+		halo = new OneFlare("data/images/sky/halo.jpg");
 		screen_center = new Point3D();
 		oposite = new Point3D();
 	}

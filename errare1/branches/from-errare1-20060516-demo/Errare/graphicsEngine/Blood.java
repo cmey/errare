@@ -23,7 +23,7 @@ public class Blood extends Particles{
 	protected float psize = 10;
 	
 	public Blood(int amount) {
-		super("medias/GraphicsEngine/Sky/star.png");
+		super("data/images/sky/big_glow.jpg");
 		how_many = amount;
 		num = amount;
 		stars = new star[num];

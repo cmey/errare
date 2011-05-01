@@ -31,6 +31,7 @@ public class HeroRep extends CharacterRep {
 		this.characteristics = characteristics;
 		this.physics = physics;
 		this.graphics=graphics;
+		this.graphics.setPhysicalRep_pointer(this.physics);
 	}
 
 	public Hero getHero() {

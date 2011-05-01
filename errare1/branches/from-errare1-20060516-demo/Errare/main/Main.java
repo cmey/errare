@@ -74,7 +74,6 @@ public class Main {
 		graphicsEngine = new GraphicsEngine(this);
 		generator = new Generator(this);
 		
-		
 		generator.generate(512);
 		
 		Toolkit tk = Toolkit.getDefaultToolkit();

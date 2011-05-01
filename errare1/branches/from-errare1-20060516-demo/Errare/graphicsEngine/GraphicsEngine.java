@@ -121,7 +121,7 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 	private Text2d text2d;
 	private ShadowMap shadowmap;
 	private Cinema cinema;
-	//private LensFlare lens;
+	private LensFlare lens;
 	private Robot robot;
 	private Cursor cursor;
 	private static Particles active_spell;
@@ -160,7 +160,7 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		shadowmap = new ShadowMap("data/images/other/shadowmapundef.png");
 		glow = new Glow();
 		cinema = new Cinema();
-		//lens = new LensFlare();
+		lens = new LensFlare();
 		cursor = new Cursor("data/images/other/cursor.png");
 		
 		try{
@@ -443,12 +443,12 @@ public class GraphicsEngine implements Runnable, GLEventListener {
 		
 		skybox.display(gld);
 		
-		/*
+		
 		if(fru.SphereInFrustum(sun.sunX,sun.sunY,sun.sunZ,100)){
 			lens.setVectors(mcx+camX, mcy+camY, mcz+camZ, mcx+lookX, mcy+lookY, mcz+lookZ, sun.sunX, sun.sunY, sun.sunZ);
 			lens.draw(gl,glu,fru);
 		}
-		*/
+		
 		
 		if(keyboardHelper.glow_on)
 			glow.renderGlow(gl,3,10);
