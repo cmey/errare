@@ -75,45 +75,29 @@ public class Generator {
 		Hashtable<Integer, CharacterPRep> set = new Hashtable<Integer, CharacterPRep>(n);
 		for(int i=0; i<n; i++) {
 			try {
+				GraphicalRep grep = null;
+				switch (n) {		
+				case 1:grep = new MD2("data/md2/pknight/tris.md2");break;
+				case 2:grep = new MD2("data/md2/necro/tris.md2");break;
+				default:grep = new MD2("data/md2/pknight/tris.md2");break;
+				}
+				CharacterPRep prep = new CharacterPRep(rand.nextInt(physicsEngine.getWidth()), rand.nextInt(physicsEngine.getHeight()), physicsEngine);
+				Hero arep = new Hero("Errare", gameEngine);
+				
 				if(i==id) {
-					GraphicalRep grep = null;
-					switch (n) {		
-					case 1:grep = new MD2("data/md2/pknight/tris.md2");break;
-					case 2:grep = new MD2("data/md2/sorcerer/tris.md2");break;
-					case 3:grep = new MD2("data/md2/wintersfaerie/tris.md2");break;
-					case 4:grep = new MD2("data/md2/yohko/tris.md2");break;
-					default:grep = new MD2("data/md2/pknight/tris.md2");break;
-					}
-					CharacterPRep prep = new CharacterPRep(rand.nextInt(physicsEngine.getWidth()), rand.nextInt(physicsEngine.getHeight()), physicsEngine);
-					Hero arep = new Hero("Errare", gameEngine);
 					HeroRep rep = new HeroRep(arep, prep, grep);
 					arep.setRep(rep);
 					prep.setRep(rep);
 					grep.setRep(rep);
-				
 					main.setMainChar(rep);
-					
-					set.put(i, prep);
 				}
 				else {
-					GraphicalRep grep = null;
-					switch (n) {		
-					case 1:grep = new MD2("data/md2/pknight/tris.md2");break;
-					case 2:grep = new MD2("data/md2/sorcerer/tris.md2");break;
-					case 3:grep = new MD2("data/md2/wintersfaerie/tris.md2");break;
-					case 4:grep = new MD2("data/md2/yohko/tris.md2");break;
-					default:grep = new MD2("data/md2/pknight/tris.md2");break;
-					}
-					CharacterPRep prep = new CharacterPRep(rand.nextInt(physicsEngine.getWidth()), rand.nextInt(physicsEngine.getHeight()), physicsEngine);
-					Hero arep = new Hero("Errare", gameEngine);
 					CharacterRep rep = new CharacterRep(arep, prep, grep);
 					arep.setRep(rep);
 					prep.setRep(rep);
 					grep.setRep(rep);
-					
-					set.put(i, prep);
 				}
-				
+				set.put(i, prep);
 				
 			}catch(IllegalArgumentException e) {
 				i--;
@@ -124,31 +108,21 @@ public class Generator {
 			networkClient.setMainChars(set);
 	}
 	
-	private void generateSpawnPoints(int n) {
-		while(n>0) {
+	private void generateSpawnPoints(int N) {
+		for(int n=1; n<=N; ++n){
 			GraphicalRep grep = null;
 			switch (n) {		
-			case 1:case 2:case 3:grep = new MD2("data/md2/awolf/tris.md2");break;
-			case 4:case 5:case 6:grep = new MD2("data/md2/centaur/tris.md2");break;
-			case 7:case 8:case 9:grep = new MD2("data/md2/cobra/tris.md2");break;
-			case 10:case 11:case 12:grep = new MD2("data/md2/darkness/tris.md2");break;
-			case 13:case 14:case 15:grep = new MD2("data/md2/demoness/tris.md2");break;
-			case 16:case 17:case 18:grep = new MD2("data/md2/gnore/tris.md2");break;
-			case 19:case 20:case 21:grep = new MD2("data/md2/goblin/tris.md2");break;
-			case 22:case 23:case 24:grep = new MD2("data/md2/hobgoblin/tris.md2");break;
-			case 25:case 26:case 27:grep = new MD2("data/md2/hydralisk/tris.md2");break;
-			case 28:case 29:case 30:grep = new MD2("data/md2/insect/tris.md2");break;
-			case 31:case 32:case 33:grep = new MD2("data/md2/jd/tris.md2");break;
-			case 34:case 35:case 36:grep = new MD2("data/md2/necro/tris.md2");break;
-			case 37:case 38:case 39:grep = new MD2("data/md2/ogre/tris.md2");break;
-			case 40:case 41:case 42:grep = new MD2("data/md2/ogro/tris.md2");break;
-			case 43:case 44:case 45:grep = new MD2("data/md2/ontra/tris.md2");break;
-			case 46:case 47:case 48:grep = new MD2("data/md2/orc/tris.md2");break;
-			case 49:case 50:case 51:grep = new MD2("data/md2/phantom/tris.md2");break;
-			case 52:case 53:case 54:grep = new MD2("data/md2/purgator/tris.md2");break;
-			case 55:case 56:case 57:grep = new MD2("data/md2/rat/tris.md2");break;
-			case 58:case 59:case 60:grep = new MD2("data/md2/wraith2/tris.md2");break;
-			default:grep = new MD2("data/md2/goblin/tris.md2");break;
+			case 16:case 17:case 18:case 7:case 8:case 9:grep = new MD2("data/md2/cobra/tris.md2");break;
+			case 1:case 2:case 3:case 10:case 11:case 12:grep = new MD2("data/md2/darkness/tris.md2");break;
+			case 4:case 5:case 6:case 13:case 14:case 15:grep = new MD2("data/md2/demoness/tris.md2");break;
+			case 19:case 20:case 21:case 22:case 23:case 24:grep = new MD2("data/md2/hobgoblin/tris.md2");break;
+			case 25:case 26:case 27:case 28:case 29:case 30:grep = new MD2("data/md2/hydralisk/tris.md2");break;
+			case 55:case 56:case 57:case 34:case 35:case 36:grep = new MD2("data/md2/necro/tris.md2");break;
+			case 52:case 53:case 54:case 37:case 38:case 39:grep = new MD2("data/md2/ogre/tris.md2");break;
+			case 40:case 41:case 42:case 31:case 32:case 33:grep = new MD2("data/md2/ogro/tris.md2");break;
+			case 49:case 50:case 51:case 43:case 44:case 45:grep = new MD2("data/md2/ontra/tris.md2");break;
+			case 58:case 59:case 60:case 46:case 47:case 48:grep = new MD2("data/md2/orc/tris.md2");break;
+			default:grep = new MD2("data/md2/ogro/tris.md2");break;
 			}
 	
 			try {
@@ -160,7 +134,6 @@ public class Generator {
 				arep.setRep(rep);
 				prep.setRep(rep);
 				grep.setRep(rep);
-				n--;
 			}catch(IllegalArgumentException e) {};
 		}
 	}
