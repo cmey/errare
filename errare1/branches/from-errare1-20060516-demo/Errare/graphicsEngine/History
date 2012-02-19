@@ -1,3 +1,10 @@
+18/02/2012 :
+- Note for Webstart : 1) jars have to be signed 2) sign all jars with the same cert
+  3) jars must not include other jars
+- Since jogl 1.x is no longer maintained and the website is down,
+ I switched to using jogl 2.x which comes from jogamp.com.
+ The API changed.
+
 17/04/2006 :
 - MouseHelper bugged under LINUX JRE 1.5.0_06 : no mouse click event generated at all.
 
